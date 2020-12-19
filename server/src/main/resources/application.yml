@@ -2,3 +2,24 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/FriendDev?ssl=false
+      database: FriendDev
+  webflux:
+    static-path-pattern: /resources/**
+
+
+
+auth:
+  jwt:
+    secret: 123456
+    calendarInterval: 10*60*60*24
+    userIdKey: userId
+    iss: pin
+
+user:
+  register:
+    code:
+      type: code6
+      expire: 60
+      cleanPeriodRate: 5
+    default:
+      avatar: /resources/ys.jpg

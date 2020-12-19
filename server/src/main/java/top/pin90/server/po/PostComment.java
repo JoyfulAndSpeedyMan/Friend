@@ -1,5 +1,6 @@
 package top.pin90.server.po;
 
+import top.pin90.common.annotation.Describe;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -16,6 +17,8 @@ public class PostComment {
     private String postId;
     private String replyId;
     private String content;
+    @Describe("评论状态")
+    private String status;
     private int thumb;
     private Date createTime;
     private Date updateTime;

@@ -1,5 +1,6 @@
 package top.pin90.server.po;
 
+import top.pin90.common.annotation.Describe;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 
@@ -13,9 +14,14 @@ public class Post {
     private String id;
     private String userId;
     private String content;
-    private Integer thumbNumber;
-    private Integer commentNumber;
-    private Integer forwardNumber;
+    @Describe("帖子状态")
+    private String status;
+    @Describe("点赞数")
+    private Integer thumb;
+    @Describe("评论数")
+    private Integer comment;
+    @Describe("转发数")
+    private Integer forward;
     private Date createTime;
     private Date updateTime;
 }
