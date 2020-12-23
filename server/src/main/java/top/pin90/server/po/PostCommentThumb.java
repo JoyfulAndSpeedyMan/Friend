@@ -14,17 +14,17 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document("PostThumb")
+@Document("PostCommentThumb")
 /**
- * 用户对帖子点赞的关系
+ * 用户对帖子评论点赞的关系
  */
-public class PostThumb {
+public class PostCommentThumb {
     @Id
     private ObjectId id;
     /**
-     * 被点赞的帖子Id
+     * 被点赞的评论Id
      */
-    private ObjectId postId;
+    private ObjectId postCommentId;
     /**
      * 点赞的用户Id
      */

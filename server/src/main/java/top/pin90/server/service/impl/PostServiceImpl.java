@@ -129,7 +129,6 @@ public class PostServiceImpl implements PostService {
                     .status(Status.NORMAL)
                     .thumb(0)
                     .createTime(date)
-                    .updateTime(date)
                     .build();
         });
         return postCommentMono
