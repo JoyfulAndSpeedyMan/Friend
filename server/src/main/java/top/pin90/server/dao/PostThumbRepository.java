@@ -1,0 +1,20 @@
+package top.pin90.server.dao;
+
+import com.mongodb.client.result.DeleteResult;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.reactive.ReactiveSortingRepository;
+import reactor.core.publisher.Mono;
+import top.pin90.server.po.PostThumb;
+
+import static org.springframework.data.mongodb.core.query.Criteria.*;
+
+public interface PostThumbRepository extends ReactiveSortingRepository<PostThumb,ObjectId> {
+    Mono<PostThumb> findFirstByPostIdAndUserId(ObjectId postId, ObjectId userId);
+
+    default Mono<DeleteResult> deleteThumb(ReactiveMongoTemplate template,ObjectId postId, ObjectId userId){
+        final Query query = new Query(where("postId").is(postId).and("userId").is(userId));
+        return template.remove(query,PostThumb.class);
+    }
+}

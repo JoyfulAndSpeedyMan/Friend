@@ -4,13 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import reactor.core.publisher.Mono;
 import top.pin90.common.pojo.Code;
 import top.pin90.common.pojo.ResponseResult;
-import reactor.core.publisher.Mono;
+import top.pin90.server.dao.PostRepository;
 import top.pin90.server.dao.UserRepository;
 import top.pin90.server.po.User;
 
-import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Criteria.*;
 import static org.springframework.data.mongodb.core.query.Query.*;
 @SpringBootTest
 public class MongoDBTest {
@@ -19,6 +20,8 @@ public class MongoDBTest {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    PostRepository postRepository;
 
     @Test
     void testQuery(){
@@ -47,7 +50,7 @@ public class MongoDBTest {
                 .doOnError(e->e.printStackTrace())
                 .subscribe();
     }
-    /*
+/*
     @Test
     void testAggregation(){
         TypedAggregation<User> aggregation = newAggregation(User.class
@@ -60,8 +63,11 @@ public class MongoDBTest {
 
         user.doOnNext(System.out::println).subscribe();
     }
+    */
 
 
+
+/*
     @Test
     void repositoryJsonTest(){
         Flux<User> userFlux = userRepository.findByJson("灰太狼");

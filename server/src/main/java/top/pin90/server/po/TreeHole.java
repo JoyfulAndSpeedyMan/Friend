@@ -1,5 +1,6 @@
 package top.pin90.server.po;
 
+import org.bson.types.ObjectId;
 import top.pin90.common.annotation.Describe;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -12,8 +13,8 @@ import java.util.Date;
 @Data
 public class TreeHole {
     @Id
-    private String id;
-    private String userId;
+    private ObjectId id;
+    private ObjectId userId;
     private String content;
     @Describe("帖子状态")
     private String status;

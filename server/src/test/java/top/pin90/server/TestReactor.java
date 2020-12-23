@@ -5,53 +5,60 @@ import org.reactivestreams.Subscription;
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestReactor {
+    Flux<Tuple2<Long, String>> flux;
+
+
+
     @Test
-    public void testEmpty(){
+    public void testEmpty() {
         Mono.just("cc")
                 .defaultIfEmpty("aa")
-                .map(s->s+"bb")
+                .map(s -> s + "bb")
                 .doOnNext(System.out::println)
                 .subscribe();
     }
+
     @Test
-    public void testZipWithEmpty(){
+    public void testZipWithEmpty() {
         final Mono<String> hh = Mono.just("hh");
         hh
                 .zipWith(Mono.empty())
-                .map(tuple->{
-                    String s=tuple.getT1()+" "+tuple.getT2();
+                .map(tuple -> {
+                    String s = tuple.getT1() + " " + tuple.getT2();
                     System.out.println(tuple);
                     return s;
                 })
                 .defaultIfEmpty("aa")
-                .doOnNext(s->{
-                    System.out.println(s);
-                })
-                .subscribe();
-    }
-    @Test
-    public void testEmptyThen(){
-        Mono.empty()
-                .zipWhen(a->{
-                    System.out.println(a);
-                    return Mono.just("bb");
-                })
-                .map(tuple->tuple.getT1()+" "+tuple.getT2())
-                .defaultIfEmpty("aa")
-                .doOnNext(s->{
+                .doOnNext(s -> {
                     System.out.println(s);
                 })
                 .subscribe();
     }
 
     @Test
-    public void testBaseSubscriber(){
+    public void testEmptyThen() {
+        Mono.empty()
+                .zipWhen(a -> {
+                    System.out.println(a);
+                    return Mono.just("bb");
+                })
+                .map(tuple -> tuple.getT1() + " " + tuple.getT2())
+                .defaultIfEmpty("aa")
+                .doOnNext(s -> {
+                    System.out.println(s);
+                })
+                .subscribe();
+    }
+
+    @Test
+    public void testBaseSubscriber() {
         SampleSubscriber<Integer> ss = new SampleSubscriber<Integer>();
         Flux<Integer> ints = Flux.range(1, 4);
         ints.subscribe(ss);
@@ -59,31 +66,32 @@ public class TestReactor {
     }
 
     @Test
-    public void testGenerate(){
+    public void testGenerate() {
         Flux<String> flux = Flux.generate(
                 () -> 0,
                 (state, sink) -> {
-                    sink.next("3 x " + state + " = " + 3*state);
+                    sink.next("3 x " + state + " = " + 3 * state);
                     if (state == 10) sink.complete();
                     return state + 1;
                 });
         flux.subscribe(System.out::println);
     }
 
-    public void testCreate(){
+    public void testCreate() {
 
 
     }
+
     @Test
     public void testInte() throws InterruptedException {
-        List<Flux<String>> list=new ArrayList<>();
-        for (int i=0;i<100;i++){
-            final int j=i;
+        List<Flux<String>> list = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            final int j = i;
             Flux<String> flux =
                     Flux.interval(Duration.ofMillis(1000))
                             .map(input -> {
-                                if (input < 1000) return "tick"+j+" " + input;
-                                throw new RuntimeException("boom"+j);
+                                if (input < 1000) return "tick" + j + " " + input;
+                                throw new RuntimeException("boom" + j);
                             })
                             .onErrorReturn("Uh oh");
             list.add(flux);
@@ -93,11 +101,14 @@ public class TestReactor {
         }
         Thread.sleep(2100);
     }
+
     @Test
-    public void testThen(){
+    public void testThen() {
 
     }
+
 }
+
 class SampleSubscriber<T> extends BaseSubscriber<T> {
 
     public void hookOnSubscribe(Subscription subscription) {
@@ -110,7 +121,9 @@ class SampleSubscriber<T> extends BaseSubscriber<T> {
 //        request(1);
     }
 }
+
 interface MyEventListener<T> {
     void onDataChunk(List<T> chunk);
+
     void processComplete();
 }

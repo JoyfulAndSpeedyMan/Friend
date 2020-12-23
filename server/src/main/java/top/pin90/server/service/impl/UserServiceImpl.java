@@ -44,6 +44,14 @@ public class UserServiceImpl implements UserService {
     final private ConcurrentHashMap<String, CodeCache> codeCacheMap = new ConcurrentHashMap<>(300);
 
 
+
+    public UserServiceImpl(SmsUtils smsUtils, JwtUtils jwtUtils, UserRepository userRepository) {
+        this.smsUtils = smsUtils;
+        this.jwtUtils = jwtUtils;
+        this.userRepository = userRepository;
+    }
+
+
     @Scheduled(cron = "0 #{'0/'+${user.register.code.cleanPeriodRate}} * * * ?")
     public void clearCodeMap() {
         if (codeCacheMap.isEmpty()) {
@@ -63,18 +71,18 @@ public class UserServiceImpl implements UserService {
         log.info("Clear codeMap Cache , {} element before are cleaned up,before clear cache size: {} , after size : {} , take {} ms", beforeSize - afterSize, beforeSize, afterSize, until);
 
     }
-
-    public UserServiceImpl(SmsUtils smsUtils, JwtUtils jwtUtils, UserRepository userRepository) {
-        this.smsUtils = smsUtils;
-        this.jwtUtils = jwtUtils;
-        this.userRepository = userRepository;
-    }
-
     @Override
     public Mono<ResponseResult> findAllUser() {
         return userRepository.findAll()
                 .collect(Collectors.toList())
                 .map(ResponseResult::ok);
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class CodeCache {
+        private String code;
+        private Date expireDate;
     }
 
     /**
@@ -150,6 +158,7 @@ public class UserServiceImpl implements UserService {
                 .switchIfEmpty(Mono.fromSupplier(()->ResponseResult.of(Code.USER_NOT_EXIST,"用户不存在")));
     }
 
+
     private CodeCache getCodeAndPut(String type, String phone) {
         String code;
         final String key = getCacheKey(type, phone);
@@ -193,10 +202,5 @@ public class UserServiceImpl implements UserService {
         return key;
     }
 
-    @Data
-    @AllArgsConstructor
-    private static class CodeCache {
-        private String code;
-        private Date expireDate;
-    }
+
 }

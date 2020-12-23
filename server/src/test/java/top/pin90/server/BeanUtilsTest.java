@@ -16,7 +16,6 @@ public class BeanUtilsTest {
     @BeforeEach
     public void init(){
         user = User.builder()
-                .id("123456")
                 .phone("45555")
                 .nickname("灰太狼")
                 .build();

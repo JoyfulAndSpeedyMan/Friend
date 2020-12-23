@@ -14,12 +14,14 @@ auth:
     calendarInterval: 10*60*60*24
     userIdKey: userId
     iss: pin
+  token:
+    key: token
 
 user:
   register:
     code:
       type: code6
       expire: 60
-      cleanPeriodRate: 5
+      cleanPeriodRate: 20
     default:
       avatar: /resources/ys.jpg

@@ -6,6 +6,7 @@ import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import org.bson.types.ObjectId;
 import org.springframework.util.StringUtils;
 import top.pin90.common.exception.auth.UserTokenExpireException;
 import top.pin90.common.exception.auth.UserVerifyException;
@@ -49,7 +50,8 @@ public class JwtUtils {
      * @param user_id
      *            登录成功后用户user_id, 参数user_id不可传空
      */
-    public  String createToken(String user_id){
+    public  String createToken(ObjectId id){
+        String userId=id.toString();
         Date iatDate = new Date();
         // expire time
         Calendar nowTime = Calendar.getInstance();
@@ -66,7 +68,7 @@ public class JwtUtils {
         String token = JWT.create().withHeader(map) // header
                 .withClaim("iss", ISS) // payload
                 .withClaim("aud", "APP")
-                .withClaim(this.USER_ID_KET, user_id)
+                .withClaim(this.USER_ID_KET, userId)
                 .withIssuedAt(iatDate) // sign time
                 .withExpiresAt(expiresDate) // expire time
                 .sign(Algorithm.HMAC256(SECRET)); // signature
@@ -105,15 +107,18 @@ public class JwtUtils {
      * @return user_id
      */
     public  String getUserId(String token) throws UserVerifyException {
-        Map<String, Claim> claims = parseToken(token);
-        Claim user_id_claim = claims.get(this.USER_ID_KET);
-        if (null == user_id_claim || !StringUtils.hasText(user_id_claim.asString())) {
-            // token 校验失败, 抛出Token验证非法异常
-            throw new UserVerifyException("User Id Invalid");
-        }
-        return user_id_claim.asString();
+        return getValue(token,USER_ID_KET);
     }
 
+    public Claim getClaim(String token,String key){
+        return parseToken(token).get(key);
+    }
+    public String getValue(String token,String key){
+        final Claim claim = getClaim(token, key);
+        if(claim==null || !StringUtils.hasText(claim.asString()))
+            throw new UserVerifyException("User Id Invalid");
+        return claim.asString();
+    }
     public static class Audience{
         public static final String APP="APP";
     }

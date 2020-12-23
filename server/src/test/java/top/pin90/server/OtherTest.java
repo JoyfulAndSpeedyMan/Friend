@@ -35,4 +35,16 @@ public class OtherTest {
         System.out.println("秒:" + cal.get(Calendar.SECOND));
     }
 
+    @Test
+    public void testType(){
+        final Class<Integer> integerClass = int.class;
+
+    }
+    private boolean isWrapClass(Class clz) {
+        try {
+            return ((Class) clz.getField("TYPE").get(null)).isPrimitive();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

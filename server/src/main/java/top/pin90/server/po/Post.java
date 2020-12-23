@@ -1,18 +1,31 @@
 package top.pin90.server.po;
 
-import top.pin90.common.annotation.Describe;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import top.pin90.common.annotation.Describe;
 
 import java.util.Date;
 /**
  * 贴吧帖子
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Document("Post")
 public class Post {
     @Id
-    private String id;
-    private String userId;
+    private ObjectId id;
+    private ObjectId userId;
+    @Describe("被转发的帖子Id")
+    private ObjectId forwardPid;
+    @Describe("被转发人的用户Id")
+    private ObjectId forwardUid;
     private String content;
     @Describe("帖子状态")
     private String status;

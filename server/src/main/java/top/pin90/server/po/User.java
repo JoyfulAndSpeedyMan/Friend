@@ -2,6 +2,7 @@ package top.pin90.server.po;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 import top.pin90.common.annotation.Describe;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +23,7 @@ import java.util.Date;
 public class User {
 
     @Id
-    private String id;
+    private ObjectId id;
     private String phone;
     private String password;
     private String nickname;

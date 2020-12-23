@@ -1,6 +1,8 @@
 package top.pin90.server.po;
 
 import lombok.Data;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
 
 /**
  * 用户状态
@@ -8,7 +10,7 @@ import lombok.Data;
 @Data
 public class UserStatus {
     public static final String NORMAL="NORMAL";
-
-    private String id;
+    @Id
+    private ObjectId id;
     private String status;
 }

@@ -12,7 +12,6 @@ import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.dao.UserRepository;
 import top.pin90.server.service.UserService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -21,11 +20,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/user")
 @Validated
-public class UserBaseController {
+public class UserController {
     final UserRepository userRepository;
     final UserService userService;
 
-    public UserBaseController(UserRepository userRepository, UserService userService) {
+    public UserController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
         this.userService = userService;
     }
@@ -62,13 +61,17 @@ public class UserBaseController {
         return userService.getUserBaseInfo(userId);
     }
 
+
+
+
     @PutMapping("/testFormData")
     @FormData
-    public Mono<ResponseResult> testFormData(@NotBlank String s1, @Valid @NotBlank String s2){
+    public Mono<ResponseResult> testFormData(@NotBlank String s1, @NotBlank String s2){
         return Mono.fromSupplier(()->{
             return ResponseResult.ok(s1+" "+s2);
         });
     }
+
 /*
     @PostMapping("/testRegister")
     @Validated
