@@ -6,8 +6,6 @@ spring:
   webflux:
     static-path-pattern: /resources/**
 
-
-
 auth:
   jwt:
     secret: 123456
@@ -25,3 +23,7 @@ user:
       cleanPeriodRate: 20
     default:
       avatar: /resources/ys.jpg
+
+chat:
+  server:
+    port: 8081

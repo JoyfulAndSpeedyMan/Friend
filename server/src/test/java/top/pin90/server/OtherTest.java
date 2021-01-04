@@ -47,4 +47,26 @@ public class OtherTest {
             return false;
         }
     }
+
+    @Test
+    public void OSTest(){
+        String name=	"os.name"; // 操作系统的名称
+        String arch=	"os.arch"; // 操作系统的架构
+        String version=	"os.version"; // 操作系统的版本号
+        System.out.println(System.getProperty(name));
+        System.out.println(System.getProperty(arch));
+
+        System.out.println(System.getProperty(version));
+
+    }
+    @Test
+    public void intTest(){
+        int a=300;
+        Integer b=300;
+        Integer c=300;
+        System.out.println(a==b);
+        System.out.println(b==c);
+
+
+    }
 }

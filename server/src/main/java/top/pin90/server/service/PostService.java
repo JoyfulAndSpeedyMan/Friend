@@ -11,5 +11,6 @@ public interface PostService {
     Mono<ResponseResult> thumb(ObjectId postId,ObjectId userId);
     Mono<ResponseResult> cancelThumb(ObjectId postId,ObjectId userId);
     Mono<ResponseResult> comment(ObjectId postId,String content,ObjectId userId);
+
     Mono<ResponseResult> forward(ObjectId postId,ObjectId userId);
 }

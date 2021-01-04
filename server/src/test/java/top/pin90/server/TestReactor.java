@@ -1,5 +1,6 @@
 package top.pin90.server;
 
+import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.Test;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.BaseSubscriber;
@@ -105,6 +106,13 @@ public class TestReactor {
     @Test
     public void testThen() {
 
+    }
+    @Test
+    public void testFlux(){
+        Flux.empty()
+                .collectList()
+                .switchIfEmpty(Mono.just(Arrays.asList(new String[]{"嗷嗷","哈哈"})))
+                .subscribe(objects ->System.out.println(objects));
     }
 
 }

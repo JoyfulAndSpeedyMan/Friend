@@ -7,20 +7,24 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.pin90.common.pojo.Code;
+import top.pin90.common.pojo.Page;
 import top.pin90.common.pojo.ResponseResult;
-import top.pin90.server.dao.PostCommentRepository;
-import top.pin90.server.dao.PostCommentThumbRepository;
-import top.pin90.server.dao.PostRepository;
-import top.pin90.server.po.PostComment;
-import top.pin90.server.po.PostCommentThumb;
-import top.pin90.server.po.Status;
+import top.pin90.server.dao.post.PostCommentRepository;
+import top.pin90.server.dao.post.PostCommentThumbRepository;
+import top.pin90.server.dao.post.PostRepository;
+import top.pin90.server.po.post.PostComment;
+import top.pin90.server.po.post.PostCommentThumb;
+import top.pin90.common.pojo.Status;
 import top.pin90.server.service.PostCommentService;
 
 import java.util.Date;
 
 import static org.springframework.data.mongodb.core.query.Criteria.*;
+import static top.pin90.server.utils.PageUtils.pageLimit;
+import static top.pin90.server.utils.PageUtils.sizeLimit;
 
 @Service
 public class PostCommentServiceImpl implements PostCommentService {
@@ -39,14 +43,21 @@ public class PostCommentServiceImpl implements PostCommentService {
 
     @Override
     public Mono<ResponseResult> findCommentByPostId(ObjectId postId, int page, int size) {
-        return postCommentRepository.findPostCommentByPostIdAndStatus(postId, Status.NORMAL, PageRequest.of(page, size))
-                .collectList()
-                .map(ResponseResult::ok);
-
+        int page1= pageLimit(page);
+        int size1= sizeLimit(size);
+        final Flux<PostComment> comment = postCommentRepository.findPostCommentByPostIdAndStatus(postId, Status.NORMAL, PageRequest.of(page1, size1));
+        final Mono<Long> longMono = postCommentRepository.countByPostIdAndStatus(postId, Status.NORMAL);
+        return Page.from(comment, longMono, page, size)
+                .map(pageResult -> {
+                    if (pageResult.empty())
+                        return ResponseResult.of(Code.CLIENT_ERROR, "帖子不存在");
+                    else
+                        return ResponseResult.ok(pageResult);
+                });
     }
 
     @Override
-    public Mono<ResponseResult> replyComment(ObjectId postId, ObjectId replyUserId, ObjectId replyId, String content,ObjectId userId) {
+    public Mono<ResponseResult> replyComment(ObjectId postId, ObjectId replyUserId, ObjectId replyId, String content, ObjectId userId) {
         return postRepository.findById(postId)
                 .zipWith(postCommentRepository.findById(replyId))
                 .map(tuple -> {
@@ -111,7 +122,7 @@ public class PostCommentServiceImpl implements PostCommentService {
     public Mono<ResponseResult> cancelThumb(ObjectId commentId, ObjectId userId) {
         // 查看用户是否已经点过赞了
         return thumbRepository.findByPostCommentIdAndUserId(commentId, userId)
-                .flatMap(thumb->{
+                .flatMap(thumb -> {
                     // 点赞数-1
                     final Query query = new Query(where("_id").is(commentId));
                     final Mono<UpdateResult> updateResultMono = template.updateFirst(query,
@@ -121,7 +132,7 @@ public class PostCommentServiceImpl implements PostCommentService {
                             .zipWith(thumbRepository.deleteByPostCommentIdAndUserId(commentId, userId))
                             // 判断结果
                             .flatMap(tuple -> {
-                                if (tuple.getT1().getModifiedCount() == 1 && tuple.getT2()==1)
+                                if (tuple.getT1().getModifiedCount() == 1 && tuple.getT2() == 1)
                                     return ResponseResult.monoOk("点赞成功");
                                 return ResponseResult.monoOf(Code.SERVER_EXE_ERROR, "点赞失败");
                             });

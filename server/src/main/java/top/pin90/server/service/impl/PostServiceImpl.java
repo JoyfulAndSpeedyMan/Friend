@@ -9,14 +9,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import top.pin90.common.pojo.Code;
+import top.pin90.common.pojo.Page;
 import top.pin90.common.pojo.ResponseResult;
-import top.pin90.server.dao.PostCommentRepository;
-import top.pin90.server.dao.PostRepository;
-import top.pin90.server.dao.PostThumbRepository;
-import top.pin90.server.po.Post;
-import top.pin90.server.po.PostComment;
-import top.pin90.server.po.PostThumb;
-import top.pin90.server.po.Status;
+import top.pin90.server.dao.post.PostCommentRepository;
+import top.pin90.server.dao.post.PostRepository;
+import top.pin90.server.dao.post.PostThumbRepository;
+import top.pin90.server.po.post.Post;
+import top.pin90.server.po.post.PostComment;
+import top.pin90.server.po.post.PostThumb;
+import top.pin90.common.pojo.Status;
 import top.pin90.server.service.PostService;
 
 import java.util.Date;
@@ -39,10 +40,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<ResponseResult> findByUserId(ObjectId userId, int page, int size) {
         final Flux<Map> postFlux = postRepository.findByUserIdAgg(template,userId, (long) page *size,size);
-        return postFlux
-                .collectList()
-                .map(ResponseResult::ok)
-                .defaultIfEmpty(ResponseResult.ok(new String[0]));
+        final Mono<Long> longMono = postRepository.countByUserIdAndStatus(userId, Status.NORMAL);
+        return Page.from(postFlux,longMono,page,size)
+                .map(ResponseResult::ok);
     }
 
     @Override

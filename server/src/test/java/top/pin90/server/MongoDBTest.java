@@ -7,9 +7,9 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import reactor.core.publisher.Mono;
 import top.pin90.common.pojo.Code;
 import top.pin90.common.pojo.ResponseResult;
-import top.pin90.server.dao.PostRepository;
-import top.pin90.server.dao.UserRepository;
-import top.pin90.server.po.User;
+import top.pin90.server.dao.post.PostRepository;
+import top.pin90.server.dao.user.UserRepository;
+import top.pin90.server.po.user.User;
 
 import static org.springframework.data.mongodb.core.query.Criteria.*;
 import static org.springframework.data.mongodb.core.query.Query.*;
@@ -43,12 +43,7 @@ public class MongoDBTest {
     }
     @Test
     void testGetBaseInfoById(){
-        userRepository.getBaseInfoById("5fdd800e708a620554878bf8")
-                .doOnNext(u->{
-                    System.out.println(u);
-                })
-                .doOnError(e->e.printStackTrace())
-                .subscribe();
+
     }
 /*
     @Test

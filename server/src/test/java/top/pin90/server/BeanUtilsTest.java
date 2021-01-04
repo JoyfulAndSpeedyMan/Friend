@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeanUtils;
 import top.pin90.common.unti.MyBeanUtils;
 import top.pin90.common.unti.MyBeanWrap;
-import top.pin90.server.po.User;
+import top.pin90.server.po.user.User;
 
 import java.util.Map;
 import java.util.TreeMap;

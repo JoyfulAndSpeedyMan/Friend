@@ -1,0 +1,14 @@
+syntax = "proto2";
+package protocol;
+
+option java_package = "top.pin90.server.chat.protocol";
+option java_outer_classname = "ChatResponseProto";
+
+message ChatResProto {
+  required int32 type = 1;    // 内容的类型
+  required string content = 2; // 内容的主体
+  optional string uri=3;      // 非消息主体的uri
+  optional string res=4;    // URI的响应结果
+}
+
+

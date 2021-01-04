@@ -7,7 +7,6 @@ import reactor.core.publisher.Mono;
 import top.pin90.common.annotation.Token;
 import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.service.PostCommentService;
-import top.pin90.server.utils.PageUtils;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -24,8 +23,7 @@ public class PostCommentController {
 
     @GetMapping
     public Mono<ResponseResult> findCommentByPostId(ObjectId postId, int page, int size){
-        page= PageUtils.pageLimit(page);
-        size= PageUtils.sizeLimit(size);
+
         return postCommentService.findCommentByPostId(postId, page, size);
     }
     @PutMapping("/reply")

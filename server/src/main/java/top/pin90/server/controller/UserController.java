@@ -1,15 +1,13 @@
 package top.pin90.server.controller;
 
+import org.bson.types.ObjectId;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import top.pin90.common.annotation.FormData;
 import top.pin90.common.annotation.Token;
 import top.pin90.common.pojo.ResponseResult;
-import top.pin90.server.dao.UserRepository;
+import top.pin90.server.dao.user.UserRepository;
 import top.pin90.server.service.UserService;
 
 import javax.validation.constraints.NotBlank;
@@ -37,7 +35,7 @@ public class UserController {
     }
 
     @PutMapping("/login")
-    public Mono<ResponseResult> login(@NotBlank(message = "不能为空")
+    public Mono<ResponseResult> login(  @NotBlank(message = "不能为空")
                                          @Pattern(regexp = "^(?:\\+?86)?1(?:3\\d{3}|5[^4\\D]\\d{2}|8\\d{3}|7(?:[01356789]\\d{2}|4(?:0\\d|1[0-2]|9\\d))|9[189]\\d{2}|6[567]\\d{2}|4[579]\\d{2})\\d{6}$",
                                                  message = "格式错误")
                                                  String phone,
@@ -50,6 +48,7 @@ public class UserController {
 
     @GetMapping("/sendLoginCode")
     public Mono<ResponseResult> sendRegisterCode(
+            @RequestParam
             @NotBlank(message = "不能为空")
             @Pattern(regexp = "^(?:\\+?86)?1(?:3\\d{3}|5[^4\\D]\\d{2}|8\\d{3}|7(?:[01356789]\\d{2}|4(?:0\\d|1[0-2]|9\\d))|9[189]\\d{2}|6[567]\\d{2}|4[579]\\d{2})\\d{6}$",
                     message = "格式错误")
@@ -57,7 +56,7 @@ public class UserController {
         return userService.sendLoginSmsCode(phone);
     }
     @GetMapping("baseInfo")
-    public Mono<ResponseResult> getBaseInfoById(@Token String userId){
+    public Mono<ResponseResult> getBaseInfoById(@Token ObjectId userId){
         return userService.getUserBaseInfo(userId);
     }
 

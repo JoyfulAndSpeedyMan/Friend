@@ -3,6 +3,7 @@ package top.pin90.server.service.impl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,12 @@ import top.pin90.common.unti.JwtUtils;
 import top.pin90.common.unti.MyBeanUtils;
 import top.pin90.common.unti.NumFormat;
 import top.pin90.common.unti.SmsUtils;
-import top.pin90.server.dao.UserRepository;
-import top.pin90.server.po.User;
-import top.pin90.server.po.UserStatus;
+import top.pin90.server.dao.user.UserFriendSettingRepository;
+import top.pin90.server.dao.user.UserRepository;
+import top.pin90.server.po.user.FriendReqVerMode;
+import top.pin90.server.po.user.User;
+import top.pin90.server.po.user.UserFriendSetting;
+import top.pin90.server.po.user.UserStatus;
 import top.pin90.server.service.UserService;
 
 import java.time.Instant;
@@ -41,14 +45,15 @@ public class UserServiceImpl implements UserService {
     final private SmsUtils smsUtils;
     final private JwtUtils jwtUtils;
     final private UserRepository userRepository;
+    final private UserFriendSettingRepository userFriendSettingRepository;
     final private ConcurrentHashMap<String, CodeCache> codeCacheMap = new ConcurrentHashMap<>(300);
 
 
-
-    public UserServiceImpl(SmsUtils smsUtils, JwtUtils jwtUtils, UserRepository userRepository) {
+    public UserServiceImpl(SmsUtils smsUtils, JwtUtils jwtUtils, UserRepository userRepository, UserFriendSettingRepository userFriendSettingRepository) {
         this.smsUtils = smsUtils;
         this.jwtUtils = jwtUtils;
         this.userRepository = userRepository;
+        this.userFriendSettingRepository = userFriendSettingRepository;
     }
 
 
@@ -68,9 +73,10 @@ public class UserServiceImpl implements UserService {
         });
         final long until = start.until(Instant.now(), ChronoUnit.MILLIS);
         int afterSize = codeCacheMap.size();
-        log.info("Clear codeMap Cache , {} element before are cleaned up,before clear cache size: {} , after size : {} , take {} ms", beforeSize - afterSize, beforeSize, afterSize, until);
+        log.info("Clear codeMap Cache , {} element are cleaned up,before clear cache size: {} , after size : {} , take {} ms", beforeSize - afterSize, beforeSize, afterSize, until);
 
     }
+
     @Override
     public Mono<ResponseResult> findAllUser() {
         return userRepository.findAll()
@@ -121,43 +127,51 @@ public class UserServiceImpl implements UserService {
                 return false;
             }
             return false;
-        }).filter(b->b)
-                .flatMap(b->{
-                    return userRepository
-                            .findFirstByPhone(phone)
-                            .switchIfEmpty(Mono.defer(() -> {
-                                final Date date = new Date();
-                                final User user = User.builder()
-                                        .phone(phone)
-                                        .nickname(phone)
-                                        .avatar(defaultAvatar)
-                                        .status(UserStatus.NORMAL)
-                                        .createTime(date)
-                                        .updateTime(date)
-                                        .build();
-                                final Mono<User> save = userRepository.save(user);
-                                return save;
-                            }))
-                            .map(u -> u.getId())
-                            .map(userId -> {
-                                // 登录逻辑
-                                final String token = jwtUtils.createToken(userId);
-                                return ResponseResult.ok("登录成功", token);
-                            });
-
+        }).filter(b -> b)
+                // 创建用户
+                .flatMap(b -> userRepository
+                        .findFirstByPhone(phone)
+                        .switchIfEmpty(Mono.defer(() -> {
+                            final Date date = new Date();
+                            final User user = User.builder()
+                                    .phone(phone)
+                                    .nickname(phone)
+                                    .avatar(defaultAvatar)
+                                    .status(UserStatus.NORMAL)
+                                    .createTime(date)
+                                    .updateTime(date)
+                                    .build();
+                            final Mono<User> save = userRepository.save(user);
+                            return save;
+                        })))
+                // 返回或创建好友验证设置
+                .zipWhen(user -> userFriendSettingRepository.findByUserId(user.getId())
+                        .switchIfEmpty(Mono.defer(() -> {
+                            final UserFriendSetting userFriendSetting = UserFriendSetting.builder()
+                                    .userId(user.getId())
+                                    .friReqVerMode(FriendReqVerMode.MESSAGE)
+                                    .build();
+                            return userFriendSettingRepository.save(userFriendSetting);
+                        })))
+                // 获取用户Id
+                .map(tuple2 -> tuple2.getT1().getId())
+                // 返回token
+                .map(userId -> {
+                    // 登录逻辑
+                    final String token = jwtUtils.createToken(userId);
+                    return ResponseResult.ok("登录成功", token);
                 })
                 .defaultIfEmpty(ResponseResult.of(Code.SMS_CODE_ERROR, "验证码不正确或已过期"));
     }
 
     @Override
-    public Mono<ResponseResult> getUserBaseInfo(String userId) {
+    public Mono<ResponseResult> getUserBaseInfo(ObjectId userId) {
         final Mono<User> baseInfoById = userRepository.getBaseInfoById(userId);
         return baseInfoById
                 .map(MyBeanUtils::beanToMap)
                 .map(ResponseResult::ok)
-                .switchIfEmpty(Mono.fromSupplier(()->ResponseResult.of(Code.USER_NOT_EXIST,"用户不存在")));
+                .switchIfEmpty(Mono.fromSupplier(() -> ResponseResult.of(Code.USER_NOT_EXIST, "用户不存在")));
     }
-
 
     private CodeCache getCodeAndPut(String type, String phone) {
         String code;

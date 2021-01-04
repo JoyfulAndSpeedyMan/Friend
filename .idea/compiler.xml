@@ -9,17 +9,22 @@
         <outputRelativeToContentRoot value="true" />
         <module name="common" />
         <module name="server" />
+        <module name="route-api" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="chat-api" target="8" />
       <module name="common" target="8" />
       <module name="friend" target="8" />
+      <module name="route-api" target="8" />
       <module name="server" target="8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="chat-api" options="-parameters" />
       <module name="common" options="-parameters" />
+      <module name="route-api" options="-parameters" />
       <module name="server" options="-parameters" />
     </option>
   </component>

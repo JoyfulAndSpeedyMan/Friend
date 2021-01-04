@@ -17,6 +17,8 @@
     <modules>
         <module>common</module>
         <module>server</module>
+        <module>chat-api</module>
+        <module>route-api</module>
     </modules>
     <dependencies>
         <dependency>
@@ -39,6 +41,13 @@
             <artifactId>lombok</artifactId>
             <version>1.18.16</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.14.0</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->

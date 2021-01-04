@@ -19,6 +19,11 @@ import java.util.*;
 
 @RestControllerAdvice
 public class ExceptionHandlers {
+    /**
+     * 参数校验出错
+     * @param e
+     * @return
+     */
     @ExceptionHandler()
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -31,6 +36,13 @@ public class ExceptionHandlers {
             }
         });
         return ResponseResult.of(Code.PARAM_ERROR, "参数错误",map);
+    }
+
+    @ExceptionHandler()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseResult handleIllegalArgumentException(IllegalArgumentException e){
+        return ResponseResult.of(Code.PARAM_ERROR,e.getMessage());
     }
 
     @ExceptionHandler()
