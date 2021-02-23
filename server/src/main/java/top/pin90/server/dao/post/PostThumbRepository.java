@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Mono;
-import top.pin90.server.po.post.PostThumb;
+import top.pin90.common.po.post.PostThumb;
 
 import static org.springframework.data.mongodb.core.query.Criteria.*;
 

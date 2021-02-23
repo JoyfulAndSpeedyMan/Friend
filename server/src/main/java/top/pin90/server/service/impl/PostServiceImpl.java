@@ -14,9 +14,9 @@ import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.dao.post.PostCommentRepository;
 import top.pin90.server.dao.post.PostRepository;
 import top.pin90.server.dao.post.PostThumbRepository;
-import top.pin90.server.po.post.Post;
-import top.pin90.server.po.post.PostComment;
-import top.pin90.server.po.post.PostThumb;
+import top.pin90.common.po.post.Post;
+import top.pin90.common.po.post.PostComment;
+import top.pin90.common.po.post.PostThumb;
 import top.pin90.common.pojo.Status;
 import top.pin90.server.service.PostService;
 
@@ -114,7 +114,7 @@ public class PostServiceImpl implements PostService {
                     else
                         return ResponseResult.of(Code.PARAM_ERROR, "更新失败");
                 })
-                .switchIfEmpty(ResponseResult.monoOf(Code.CLIENT_ERROR, "你还没有点赞"));
+                .switchIfEmpty(ResponseResult.toMono(Code.CLIENT_ERROR, "你还没有点赞"));
     }
 
     @Override

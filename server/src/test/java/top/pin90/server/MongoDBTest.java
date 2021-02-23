@@ -9,7 +9,7 @@ import top.pin90.common.pojo.Code;
 import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.dao.post.PostRepository;
 import top.pin90.server.dao.user.UserRepository;
-import top.pin90.server.po.user.User;
+import top.pin90.common.po.user.User;
 
 import static org.springframework.data.mongodb.core.query.Criteria.*;
 import static org.springframework.data.mongodb.core.query.Query.*;

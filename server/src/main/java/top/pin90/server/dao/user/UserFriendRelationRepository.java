@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.pin90.server.po.user.UserFriendRelation;
+import top.pin90.common.po.user.UserFriendRelation;
 
 public interface UserFriendRelationRepository extends ReactiveMongoRepository<UserFriendRelation, ObjectId> {
     /**

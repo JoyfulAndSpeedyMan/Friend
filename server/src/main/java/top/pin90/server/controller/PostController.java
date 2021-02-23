@@ -27,7 +27,7 @@ public class PostController {
     }
     @ExceptionHandler
     public Mono<ResponseResult> handNumberFormatException(NumberFormatException e){
-        return ResponseResult.monoOf(Code.PARAM_ERROR,"参数错误");
+        return ResponseResult.toMono(Code.PARAM_ERROR,"参数错误");
     }
 
     @GetMapping

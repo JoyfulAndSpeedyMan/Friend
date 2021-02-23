@@ -4,13 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>friend</artifactId>
-        <groupId>top.pin90</groupId>
+        <groupId>top.pin90.friend</groupId>
+        <artifactId>parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>server</artifactId>
-
 
     <properties>
         <java.version>1.8</java.version>
@@ -18,11 +17,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>top.pin90</groupId>
+            <groupId>top.pin90.friend</groupId>
             <artifactId>common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-
+        <dependency>
+            <groupId>top.pin90.friend</groupId>
+            <artifactId>route-server-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
@@ -33,9 +36,25 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.projectreactor/reactor-core -->
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+        </dependency>
+        <!-- test-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+
     </dependencies>
 
     <build>

@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.pin90.server.po.post.Post;
+import top.pin90.common.po.post.Post;
 import top.pin90.common.pojo.Status;
 
 import java.util.Map;

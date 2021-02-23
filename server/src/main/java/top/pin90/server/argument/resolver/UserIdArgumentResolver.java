@@ -1,6 +1,7 @@
 package top.pin90.server.argument.resolver;
 
 import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.apache.logging.log4j.util.Strings;
 import org.bson.types.ObjectId;
 import org.springframework.core.MethodParameter;
@@ -13,15 +14,16 @@ import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import top.pin90.common.annotation.Token;
 import top.pin90.common.exception.auth.UserVerifyException;
+import top.pin90.common.po.user.User;
+import top.pin90.common.po.user.UserStatus;
 import top.pin90.common.unti.JwtUtils;
-import top.pin90.server.po.user.User;
-import top.pin90.server.po.user.UserStatus;
 
 import java.util.List;
 
-import static org.springframework.data.mongodb.core.query.Criteria.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -69,7 +71,13 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
                     monoSink.error(new UserVerifyException("身份验证失败"));
                 else{
                     final String token = tokenList.get(0);
-                    final Claim claim = jwtUtils.getClaim(token, key);
+                    DecodedJWT decodedJWT = jwtUtils.parseToken(token);
+                    if(jwtUtils.isRefreshToken(decodedJWT)){
+                        monoSink.error(new UserVerifyException("身份验证失败"));
+                        return;
+                    }
+                    final Claim claim = decodedJWT.getClaims().get(key);
+
                     if (null == claim || !StringUtils.hasText(claim.asString())) {
                         monoSink.error(new UserVerifyException("身份验证失败"));
                         return;
@@ -83,22 +91,27 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
                     monoSink.success();
                 else{
                     final String token = tokenList.get(0);
-                    final Claim claim = jwtUtils.getClaim(token, key);
+                    DecodedJWT decodedJWT = jwtUtils.parseToken(token);
+                    if(jwtUtils.isRefreshToken(decodedJWT)){
+                        monoSink.success();
+                        return;
+                    }
+                    final Claim claim = decodedJWT.getClaims().get(key);
                     if (null == claim || !StringUtils.hasText(claim.asString()))
                         monoSink.success();
                     else
                         monoSink.success(new ObjectId(claim.asString()));
                 }
             }
-        }).zipWhen(id->existUser(id))
+        }).
+                subscribeOn(Schedulers.parallel())
+                .zipWhen(this::existUser)
                 .map(tuple->{
                     if(tuple.getT2()){
                         return tuple.getT1();
                     }
                     throw new UserVerifyException("用户"+tuple.getT1()+"不存在");
                 });
-
-
     }
 
     private Mono<Boolean> existUser(ObjectId userId){

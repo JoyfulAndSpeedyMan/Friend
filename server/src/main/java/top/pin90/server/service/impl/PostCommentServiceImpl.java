@@ -15,8 +15,8 @@ import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.dao.post.PostCommentRepository;
 import top.pin90.server.dao.post.PostCommentThumbRepository;
 import top.pin90.server.dao.post.PostRepository;
-import top.pin90.server.po.post.PostComment;
-import top.pin90.server.po.post.PostCommentThumb;
+import top.pin90.common.po.post.PostComment;
+import top.pin90.common.po.post.PostCommentThumb;
 import top.pin90.common.pojo.Status;
 import top.pin90.server.service.PostCommentService;
 
@@ -74,14 +74,14 @@ public class PostCommentServiceImpl implements PostCommentService {
                 })
                 .flatMap(postCommentRepository::save)
                 .flatMap(ResponseResult::monoOk)
-                .switchIfEmpty(ResponseResult.monoOf(Code.PARAM_ERROR, "评论不存在"));
+                .switchIfEmpty(ResponseResult.toMono(Code.PARAM_ERROR, "评论不存在"));
     }
 
     @Override
     public Mono<ResponseResult> deleteComment(ObjectId commentId, ObjectId userId) {
         return postCommentRepository.deleteByIdAndUserId(commentId, userId)
                 .flatMap(v -> ResponseResult.monoOk("删除成功", commentId))
-                .switchIfEmpty(ResponseResult.monoOf(Code.CLIENT_ERROR, "评论不存在"));
+                .switchIfEmpty(ResponseResult.toMono(Code.CLIENT_ERROR, "评论不存在"));
     }
 
     @Override
@@ -107,13 +107,13 @@ public class PostCommentServiceImpl implements PostCommentService {
                     .flatMap(tuple -> {
                         if (tuple.getT1().getModifiedCount() == 1)
                             return ResponseResult.monoOk("点赞成功");
-                        return ResponseResult.monoOf(Code.SERVER_EXE_ERROR, "点赞失败");
+                        return ResponseResult.toMono(Code.SERVER_EXE_ERROR, "点赞失败");
                     })
-                    .switchIfEmpty(ResponseResult.monoOf(Code.SERVER_EXE_ERROR, "点赞失败"));
+                    .switchIfEmpty(ResponseResult.toMono(Code.SERVER_EXE_ERROR, "点赞失败"));
         });
         // 查看用户是否已经点过赞了
         return thumbRepository.findByPostCommentIdAndUserId(commentId, userId)
-                .flatMap(comment -> ResponseResult.monoOf(Code.OPERATION_ERROR, "已经点过赞了"))
+                .flatMap(comment -> ResponseResult.toMono(Code.OPERATION_ERROR, "已经点过赞了"))
                 // 执行逻辑
                 .switchIfEmpty(defer);
     }
@@ -134,10 +134,10 @@ public class PostCommentServiceImpl implements PostCommentService {
                             .flatMap(tuple -> {
                                 if (tuple.getT1().getModifiedCount() == 1 && tuple.getT2() == 1)
                                     return ResponseResult.monoOk("点赞成功");
-                                return ResponseResult.monoOf(Code.SERVER_EXE_ERROR, "点赞失败");
+                                return ResponseResult.toMono(Code.SERVER_EXE_ERROR, "点赞失败");
                             });
                 })
                 // 执行逻辑
-                .switchIfEmpty(ResponseResult.monoOf(Code.OPERATION_ERROR, "你还没有点赞"));
+                .switchIfEmpty(ResponseResult.toMono(Code.OPERATION_ERROR, "你还没有点赞"));
     }
 }

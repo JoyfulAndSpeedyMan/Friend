@@ -42,6 +42,7 @@ public class ExceptionHandlers {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseResult handleIllegalArgumentException(IllegalArgumentException e){
+        e.printStackTrace();
         return ResponseResult.of(Code.PARAM_ERROR,e.getMessage());
     }
 

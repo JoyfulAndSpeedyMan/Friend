@@ -6,6 +6,7 @@ import org.reactivestreams.Subscription;
 import reactor.core.publisher.BaseSubscriber;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.function.Tuple2;
 
 import java.time.Duration;
@@ -14,7 +15,6 @@ import java.util.List;
 
 public class TestReactor {
     Flux<Tuple2<Long, String>> flux;
-
 
 
     @Test
@@ -107,12 +107,66 @@ public class TestReactor {
     public void testThen() {
 
     }
+
     @Test
-    public void testFlux(){
+    public void testFlux() {
         Flux.empty()
                 .collectList()
-                .switchIfEmpty(Mono.just(Arrays.asList(new String[]{"嗷嗷","哈哈"})))
-                .subscribe(objects ->System.out.println(objects));
+                .switchIfEmpty(Mono.just(Arrays.asList(new String[]{"嗷嗷", "哈哈"})))
+                .subscribe(objects -> System.out.println(objects));
+    }
+
+    @Test
+    public void testThread() throws InterruptedException {
+        boolean flag = true;
+        Mono<Integer> mono1 = Mono.<String>create(monoSink -> {
+            System.out.println(tid("mono1 create"));
+            if (flag)
+                monoSink.success("11");
+            else
+                monoSink.success();
+        })
+//                .subscribeOn(Schedulers.single())
+//                .publishOn(Schedulers.single())
+                .map(s -> {
+                    System.out.println(tid("mono1 map"));
+                    return Integer.valueOf(s);
+                });
+        Mono<Integer> mono2 = Mono.<String>create(monoSink -> {
+            System.out.println(tid("mono2 create"));
+            if (flag)
+                monoSink.success("22");
+            else
+                monoSink.success();
+        })
+//                .publishOn(Schedulers.parallel())
+
+                .subscribeOn(Schedulers.elastic())
+                .map(s -> {
+                    System.out.println(tid("mono2 map"));
+                    return Integer.valueOf(s);
+                });
+        Mono<String> zipWith = mono1.zipWith(mono2)
+                .map(tuple -> {
+                    System.out.println(tid("zip map"));
+                    return String.format("mono1:%2d , mono2:%2d", tuple.getT1(), tuple.getT2());
+                });
+        Mono<String> zipWhen = mono1.zipWhen(m -> mono2)
+
+                .map(tuple -> {
+                    System.out.println(tid("zip map"));
+                    return String.format("mono1:%2d , mono2:%2d", tuple.getT1(), tuple.getT2());
+                });
+        zipWhen
+                .subscribe(s -> {
+                    System.out.println(tid("zip subscribe"));
+                    System.out.println(s);
+                });
+        Thread.currentThread().join();
+    }
+
+    private String tid(String id) {
+        return String.format("%-15s%s", Thread.currentThread().getName(), id);
     }
 
 }

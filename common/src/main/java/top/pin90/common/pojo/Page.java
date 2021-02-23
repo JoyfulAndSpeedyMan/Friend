@@ -22,6 +22,7 @@ public class Page<T> {
         return from(objectFlux,totalMono, -1,-1);
     }
 
+
     public static <T> Mono<Page<T>> from(Flux<T> objectFlux, Mono<Long> totalMono, int page, int pageSize) {
         return objectFlux
                 .collectList()
@@ -32,6 +33,7 @@ public class Page<T> {
                     return new Page<T>(total, page, pageSize, list);
                 });
     }
+
 
     private Page(long total, List<T> list) {
         this(total, -1, -1, list);

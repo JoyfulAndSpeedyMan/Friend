@@ -9,6 +9,7 @@ public interface UserService {
     Mono<ResponseResult> sendLoginSmsCode(String phone);
 
     Mono<ResponseResult> smsCodeLogin(String phone, String code);
+    Mono<ResponseResult> refreshToken(String refreshToken);
     Mono<ResponseResult> getUserBaseInfo(ObjectId userId);
 
 }

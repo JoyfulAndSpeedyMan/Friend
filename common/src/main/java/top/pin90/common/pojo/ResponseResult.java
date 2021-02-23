@@ -62,24 +62,24 @@ public class ResponseResult {
         return of(Code.OK, message, data);
     }
 
-    public static Mono<ResponseResult> monoOf(String code, String message, Object data) {
+    public static Mono<ResponseResult> toMono(String code, String message, Object data) {
         return Mono.fromSupplier(()->ResponseResult.of(code, message, data));
     }
-    public static Mono<ResponseResult> monoOf(String code, String message){
-        return monoOf(code, message,null);
+    public static Mono<ResponseResult> toMono(String code, String message){
+        return toMono(code, message,null);
     }
 
     public static Mono<ResponseResult> monoOk(String message){
-        return monoOf(Code.OK,message,null);
+        return toMono(Code.OK,message,null);
     }
     public static Mono<ResponseResult> monoOk(Object data){
-        return monoOf(Code.OK,null,data);
+        return toMono(Code.OK,null,data);
     }
     public static Mono<ResponseResult> monoOkString(String data){
-        return monoOf(Code.OK,null,data);
+        return toMono(Code.OK,null,data);
     }
     public static Mono<ResponseResult> monoOk(String message, Object data){
-        return monoOf(Code.OK,message,data);
+        return toMono(Code.OK,message,data);
     }
 
 }

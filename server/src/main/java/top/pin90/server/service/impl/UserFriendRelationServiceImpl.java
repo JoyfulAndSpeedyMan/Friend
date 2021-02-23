@@ -16,9 +16,9 @@ import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.dao.user.UserFriendRelationRepository;
 import top.pin90.server.dao.user.UserFriendSettingRepository;
 import top.pin90.server.dao.user.UserRepository;
-import top.pin90.server.po.user.FriendReqVerMode;
-import top.pin90.server.po.user.UserFriendRelation;
-import top.pin90.server.po.user.UserFriendRelationStatus;
+import top.pin90.common.po.user.FriendReqVerMode;
+import top.pin90.common.po.user.UserFriendRelation;
+import top.pin90.common.po.user.UserFriendRelationStatus;
 import top.pin90.server.service.UserFriendRelationService;
 
 import java.util.Date;
@@ -148,7 +148,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                 })
                 .map(r -> ResponseResult.ok("操作成功"))
                 // 处理返回结果
-                .switchIfEmpty(ResponseResult.monoOf(Code.USER_VERITY_ERROR, "添加失败"));
+                .switchIfEmpty(ResponseResult.toMono(Code.USER_VERITY_ERROR, "添加失败"));
     }
 
     @Override
@@ -172,7 +172,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
             if (result.getMatchedCount() == 1) {
                 return userFriendRelationMono.map(u -> ResponseResult.ok("操作成功"));
             }
-            return ResponseResult.monoOf(Code.CLIENT_ERROR, "还没有好友请求");
+            return ResponseResult.toMono(Code.CLIENT_ERROR, "还没有好友请求");
         });
 
     }
@@ -194,7 +194,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                     return friendRelationRepository.save(relation);
                 })
                 .map(relation -> ResponseResult.ok("操作成功！"))
-                .switchIfEmpty(ResponseResult.monoOf(Code.CLIENT_ERROR, "好友请求不存在"));
+                .switchIfEmpty(ResponseResult.toMono(Code.CLIENT_ERROR, "好友请求不存在"));
     }
 
     @Override
@@ -209,7 +209,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                     return friendRelationRepository.save(relation);
                 })
                 .map(relation -> ResponseResult.ok("操作成功！"))
-                .switchIfEmpty(ResponseResult.monoOf(Code.CLIENT_ERROR, "好友请求不存在"));
+                .switchIfEmpty(ResponseResult.toMono(Code.CLIENT_ERROR, "好友请求不存在"));
     }
 
     @Override

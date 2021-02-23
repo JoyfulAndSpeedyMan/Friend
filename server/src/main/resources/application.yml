@@ -1,3 +1,5 @@
+server:
+  port: 10000
 spring:
   data:
     mongodb:
@@ -5,25 +7,28 @@ spring:
       database: FriendDev
   webflux:
     static-path-pattern: /resources/**
-
+  application:
+    name: server
+  redis:
+    host: 192.168.0.111
 auth:
   jwt:
     secret: 123456
-    calendarInterval: 10*60*60*24
     userIdKey: userId
     iss: pin
   token:
     key: token
-
 user:
-  register:
+  login:
+    accessValidTime: 864000 # 4个小时
+    refreshValidTime: 155520000 # 30天
     code:
-      type: code6
-      expire: 60
-      cleanPeriodRate: 20
-    default:
+      codeType: code6
+      validTime: 60
+    new:
       avatar: /resources/ys.jpg
-
-chat:
-  server:
-    port: 8081
+logging:
+  level:
+    top:
+      pin90:
+        server: trace

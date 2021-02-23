@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Mono;
-import top.pin90.server.po.user.User;
+import top.pin90.common.po.user.User;
 
 public interface UserRepository extends ReactiveSortingRepository<User, ObjectId> {
 

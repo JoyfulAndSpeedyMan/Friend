@@ -23,10 +23,6 @@ public class JwtUtils {
      */
     private  final String SECRET;
     /**
-     * token 默认过期时间
-     */
-    private  final int calendarInterval;
-    /**
      * 用户Id key
      */
     private  final String USER_ID_KET;
@@ -34,12 +30,18 @@ public class JwtUtils {
      * 签发者
      */
     private  final String ISS;
-
-    public JwtUtils(String SECRET,int calendarInterval,String USER_ID_KET,String ISS) {
+    /**
+     * 标志是否是refreshToken的key
+     */
+    private final String rsKey;
+    public JwtUtils(String SECRET, String USER_ID_KET, String ISS){
+        this(SECRET,USER_ID_KET,ISS,"rt");
+    }
+    public JwtUtils(String SECRET, String USER_ID_KET, String ISS, String rsKey) {
         this.SECRET = SECRET;
-        this.calendarInterval = calendarInterval;
         this.ISS=ISS;
         this.USER_ID_KET=USER_ID_KET;
+        this.rsKey = rsKey;
     }
 
     /**
@@ -47,32 +49,52 @@ public class JwtUtils {
      *
      * JWT构成: header, payload, signature
      *
-     * @param user_id
-     *            登录成功后用户user_id, 参数user_id不可传空
+     * @param id
+     *            登录成功后用户id, 参数id不可传空
      */
-    public  String createToken(ObjectId id){
+    public  String createAccessToken(ObjectId id, int validTime){
         String userId=id.toString();
-        Date iatDate = new Date();
-        // expire time
-        Calendar nowTime = Calendar.getInstance();
-        nowTime.add(Calendar.SECOND, calendarInterval);
-        Date expiresDate = nowTime.getTime();
 
-        // header Map
+        String token = JWT.create()
+                .withHeader(getDefaultHeads()) // header
+                .withClaim("iss", ISS) // payload
+                .withClaim(this.USER_ID_KET, userId)
+                .withIssuedAt(new Date()) // sign time
+                .withExpiresAt(getExpireTime(validTime)) // expire time
+                .sign(Algorithm.HMAC256(SECRET)); // signature
+        return token;
+    }
+    public  String refreshAccessToken(ObjectId id, int validTime){
+        String userId=id.toString();
+        String token = JWT.create()
+                .withHeader(getDefaultHeads()) // header
+                .withClaim("iss", ISS) // payload
+                .withClaim(this.USER_ID_KET, userId)
+                .withClaim(rsKey,true)   // 设置为refreshToken
+                .withIssuedAt(new Date()) // sign time
+                .withExpiresAt(getExpireTime(validTime)) // expire time
+                .sign(Algorithm.HMAC256(SECRET)); // signature
+        return token;
+    }
+    public boolean isRefreshToken(String token){
+        return isRefreshToken(parseToken(token));
+    }
+    public boolean isRefreshToken(DecodedJWT decodedJWT){
+        return decodedJWT.getClaims().containsKey(rsKey);
+    }
+    public Map<String, Object> getDefaultHeads(){
         Map<String, Object> map = new HashMap<>();
         map.put("alg", "HS256");
         map.put("typ", "JWT");
-
-        // build token
-        // param backups {iss:Service, aud:APP}
-        String token = JWT.create().withHeader(map) // header
-                .withClaim("iss", ISS) // payload
-                .withClaim("aud", "APP")
-                .withClaim(this.USER_ID_KET, userId)
-                .withIssuedAt(iatDate) // sign time
-                .withExpiresAt(expiresDate) // expire time
-                .sign(Algorithm.HMAC256(SECRET)); // signature
-        return token;
+        return map;
+    }
+    public Date getExpireTime(int validTime){
+        Date iatDate = new Date();
+        // expire time
+        Calendar nowTime = Calendar.getInstance();
+        nowTime.add(Calendar.SECOND, validTime);
+        Date expiresDate = nowTime.getTime();
+        return expiresDate;
     }
 
     /**
@@ -82,7 +104,9 @@ public class JwtUtils {
      * @return
      * @throws Exception
      */
-    public  Map<String, Claim> parseToken(String token) {
+    public  DecodedJWT parseToken(String token) {
+        if(!StringUtils.hasLength(token))
+            throw new UserVerifyException("token不能为空");
         DecodedJWT jwt = null;
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SECRET)).build();
         try {
@@ -97,21 +121,25 @@ public class JwtUtils {
         catch (InvalidClaimException | SignatureVerificationException | JWTDecodeException e){
             throw new UserVerifyException("token不正确",e);
         }
-        return jwt.getClaims();
+        return jwt;
     }
-
+    public Map<String,Claim> getClaims(String token){
+        return parseToken(token).getClaims();
+    }
     /**
      * 根据Token获取user_id
      *
      * @param token
      * @return user_id
      */
-    public  String getUserId(String token) throws UserVerifyException {
-        return getValue(token,USER_ID_KET);
+    public  ObjectId getUserId(String token) throws UserVerifyException {
+        return new ObjectId(getValue(token,USER_ID_KET));
     }
-
+    public ObjectId getUserId(DecodedJWT decodedJWT){
+        return new ObjectId(decodedJWT.getClaims().get(USER_ID_KET).asString());
+    }
     public Claim getClaim(String token,String key){
-        return parseToken(token).get(key);
+        return getClaims(token).get(key);
     }
     public String getValue(String token,String key){
         final Claim claim = getClaim(token, key);
@@ -119,8 +147,4 @@ public class JwtUtils {
             throw new UserVerifyException("User Id Invalid");
         return claim.asString();
     }
-    public static class Audience{
-        public static final String APP="APP";
-    }
-
 }
