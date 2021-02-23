@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/chat-server/chat-server.iml" filepath="$PROJECT_DIR$/chat-server/chat-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/chat-server-api/chat-server-api.iml" filepath="$PROJECT_DIR$/chat-server-api/chat-server-api.iml" />
-      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/friend.iml" filepath="$PROJECT_DIR$/friend.iml" />
       <module fileurl="file://$PROJECT_DIR$/route-server/route-server.iml" filepath="$PROJECT_DIR$/route-server/route-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/route-server-api/route-server-api.iml" filepath="$PROJECT_DIR$/route-server-api/route-server-api.iml" />
