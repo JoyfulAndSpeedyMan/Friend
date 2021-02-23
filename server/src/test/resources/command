@@ -1,0 +1,18 @@
+[{$lookup: {
+  from: 'UserRole',
+  localField: 'role',
+  foreignField: '_id',
+  as: 'arr'
+}}, {$replaceRoot: {
+  newRoot: {
+    $mergeObjects:[
+      {$arrayElemAt:["$arr",0]},
+      "$$ROOT"
+      ]
+  }
+}}, {$project: {
+  username:1,
+  nickname:1,
+  name:1,
+  permission:1
+}}]

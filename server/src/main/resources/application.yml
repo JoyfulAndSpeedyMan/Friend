@@ -1,4 +1,34 @@
+server:
+  port: 10000
 spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/FriendDev?ssl=false
+      database: FriendDev
+  webflux:
+    static-path-pattern: /resources/**
+  application:
+    name: server
+  redis:
+    host: 192.168.0.111
+auth:
+  jwt:
+    secret: 123456
+    userIdKey: userId
+    iss: pin
+  token:
+    key: token
+user:
+  login:
+    accessValidTime: 864000 # 4个小时
+    refreshValidTime: 155520000 # 30天
+    code:
+      codeType: code6
+      validTime: 60
+    new:
+      avatar: /resources/ys.jpg
+logging:
+  level:
+    top:
+      pin90:
+        server: trace

@@ -7,15 +7,47 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="common" />
+        <module name="chat-server" />
         <module name="server" />
+        <module name="chat-server-api" />
+        <module name="route-server-api" />
+        <module name="common" />
+        <module name="route-server" />
+        <module name="char-server" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="char-server" target="8" />
+      <module name="chat-api" target="8" />
+      <module name="chat-server" target="8" />
+      <module name="chat-server-api" target="8" />
+      <module name="ChatServer" target="8" />
+      <module name="common" target="8" />
+      <module name="eureka" target="8" />
+      <module name="friend" target="8" />
+      <module name="route-api" target="8" />
+      <module name="route-server" target="8" />
+      <module name="route-server-api" target="8" />
+      <module name="RouterServer" target="8" />
+      <module name="server" target="8" />
+      <module name="server-api" target="8" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ChatServer" options="-parameters" />
+      <module name="RouterServer" options="-parameters" />
+      <module name="char-server" options="-parameters" />
+      <module name="chat-api" options="-parameters" />
+      <module name="chat-server" options="-parameters" />
+      <module name="chat-server-api" options="-parameters" />
       <module name="common" options="-parameters" />
+      <module name="eureka" options="-parameters" />
+      <module name="route-api" options="-parameters" />
+      <module name="route-server" options="-parameters" />
+      <module name="route-server-api" options="-parameters" />
       <module name="server" options="-parameters" />
+      <module name="server-api" options="-parameters" />
     </option>
   </component>
 </project>
