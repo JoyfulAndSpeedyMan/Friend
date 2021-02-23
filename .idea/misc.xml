@@ -15,8 +15,7 @@
     </option>
     <option name="ignoredFiles">
       <set>
-        <option value="$PROJECT_DIR$/route-api/pom.xml" />
-        <option value="$PROJECT_DIR$/server-api/pom.xml" />
+        <option value="$PROJECT_DIR$/common/pom.xml" />
       </set>
     </option>
   </component>

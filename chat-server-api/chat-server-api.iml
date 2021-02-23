@@ -16,7 +16,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="common" />
+    <orderEntry type="library" name="Maven: top.pin90.friend:common:1.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-mongodb-reactive:2.3.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-reactivestreams:4.0.3" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:bson:4.0.3" level="project" />
