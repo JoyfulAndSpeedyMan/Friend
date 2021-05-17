@@ -31,7 +31,14 @@ public class PostController {
     }
 
     @GetMapping
-    Mono<ResponseResult> findByUserId(@Token ObjectId userId, int page, int size){
+    Mono<ResponseResult> findAll(@RequestParam int page,@RequestParam int size){
+        page=PageUtils.pageLimit(page);
+        size=PageUtils.sizeLimit(size);
+        return postService.findAll(page, size);
+    }
+
+    @GetMapping("/user")
+    Mono<ResponseResult> findByUserId(@Token ObjectId userId,@RequestParam int page,@RequestParam int size){
         page=PageUtils.pageLimit(page);
         size=PageUtils.sizeLimit(size);
         return postService.findByUserId(userId, page, size);

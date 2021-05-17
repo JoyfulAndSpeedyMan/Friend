@@ -5,6 +5,7 @@ import reactor.core.publisher.Mono;
 import top.pin90.common.pojo.ResponseResult;
 
 public interface PostService {
+    Mono<ResponseResult> findAll(int page, int size);
     Mono<ResponseResult> findByUserId(ObjectId userId, int page, int size);
     Mono<ResponseResult> savePost(String content, ObjectId userId);
     Mono<ResponseResult> deletePostById(ObjectId postId,ObjectId userId);

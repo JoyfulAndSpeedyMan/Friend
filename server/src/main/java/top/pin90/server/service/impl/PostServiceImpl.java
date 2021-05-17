@@ -3,21 +3,22 @@ package top.pin90.server.service.impl;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import top.pin90.common.pojo.Code;
-import top.pin90.common.pojo.Page;
-import top.pin90.common.pojo.ResponseResult;
-import top.pin90.server.dao.post.PostCommentRepository;
-import top.pin90.server.dao.post.PostRepository;
-import top.pin90.server.dao.post.PostThumbRepository;
 import top.pin90.common.po.post.Post;
 import top.pin90.common.po.post.PostComment;
 import top.pin90.common.po.post.PostThumb;
+import top.pin90.common.pojo.Code;
+import top.pin90.common.pojo.Page;
+import top.pin90.common.pojo.ResponseResult;
 import top.pin90.common.pojo.Status;
+import top.pin90.server.dao.post.PostCommentRepository;
+import top.pin90.server.dao.post.PostRepository;
+import top.pin90.server.dao.post.PostThumbRepository;
 import top.pin90.server.service.PostService;
 
 import java.util.Date;
@@ -35,6 +36,14 @@ public class PostServiceImpl implements PostService {
         this.postThumbRepository = postThumbRepository;
         this.postCommentRepository = postCommentRepository;
         this.template = template;
+    }
+
+    @Override
+    public Mono<ResponseResult> findAll(int page,int size) {
+        Flux<Post> allByStatus = postRepository.findAllByStatus(Status.NORMAL, PageRequest.of(page, size));
+        Mono<Long> count = postRepository.count();
+        return Page.from(allByStatus, count, page, size)
+                .map(ResponseResult::ok);
     }
 
     @Override

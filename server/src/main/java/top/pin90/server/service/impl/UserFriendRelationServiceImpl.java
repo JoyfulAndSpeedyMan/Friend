@@ -65,9 +65,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
         final Mono<Long> longMono = friendRelationRepository.countBySuid(userId);
 
         return Page.from(relationFlux, longMono, page, size)
-                .map(p -> {
-                    return ResponseResult.ok(p);
-                });
+                .map(ResponseResult::ok);
     }
 
     @Override
