@@ -64,7 +64,10 @@ public class UserController {
     }
 
 
-
+    @GetMapping("/refreshToken")
+    public Mono<ResponseResult> refreshToken(String refreshToken){
+        return userService.refreshToken(refreshToken);
+    }
 
     @PutMapping("/testFormData")
     @FormData

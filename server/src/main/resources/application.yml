@@ -11,6 +11,8 @@ spring:
     name: server
   redis:
     host: localhost
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 auth:
   jwt:
     secret: 123456
@@ -20,8 +22,8 @@ auth:
     key: token
 user:
   login:
-    accessValidTime: 864000 # 4个小时
-    refreshValidTime: 155520000 # 30天
+    accessValidTime: 864000
+    refreshValidTime: 155520000
     code:
       codeType: code6
       validTime: 60

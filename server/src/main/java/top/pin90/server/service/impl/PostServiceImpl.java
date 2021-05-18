@@ -3,12 +3,12 @@ package top.pin90.server.service.impl;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
+import top.pin90.common.dao.BsonManager;
 import top.pin90.common.po.post.Post;
 import top.pin90.common.po.post.PostComment;
 import top.pin90.common.po.post.PostThumb;
@@ -16,6 +16,7 @@ import top.pin90.common.pojo.Code;
 import top.pin90.common.pojo.Page;
 import top.pin90.common.pojo.ResponseResult;
 import top.pin90.common.pojo.Status;
+import top.pin90.common.unti.DateUtils;
 import top.pin90.server.dao.post.PostCommentRepository;
 import top.pin90.server.dao.post.PostRepository;
 import top.pin90.server.dao.post.PostThumbRepository;
@@ -30,27 +31,33 @@ public class PostServiceImpl implements PostService {
     final private PostThumbRepository postThumbRepository;
     final private PostCommentRepository postCommentRepository;
     final private ReactiveMongoTemplate template;
+    final private BsonManager bsonManager;
 
-    public PostServiceImpl(PostRepository postRepository, PostThumbRepository postThumbRepository, PostCommentRepository postCommentRepository, ReactiveMongoTemplate template) {
+    public PostServiceImpl(PostRepository postRepository, PostThumbRepository postThumbRepository,
+                           PostCommentRepository postCommentRepository, ReactiveMongoTemplate template,
+                           BsonManager bsonManager) {
         this.postRepository = postRepository;
         this.postThumbRepository = postThumbRepository;
         this.postCommentRepository = postCommentRepository;
         this.template = template;
+        this.bsonManager = bsonManager;
     }
 
     @Override
-    public Mono<ResponseResult> findAll(int page,int size) {
-        Flux<Post> allByStatus = postRepository.findAllByStatus(Status.NORMAL, PageRequest.of(page, size));
+    public Mono<ResponseResult> findAll(int page, int size) {
+        Flux<Map> allPost = postRepository.findAllPost(template, bsonManager, page, size)
+                .map(DateUtils::process);
         Mono<Long> count = postRepository.count();
-        return Page.from(allByStatus, count, page, size)
+        return Page.from(allPost, count, page, size)
                 .map(ResponseResult::ok);
     }
 
     @Override
     public Mono<ResponseResult> findByUserId(ObjectId userId, int page, int size) {
-        final Flux<Map> postFlux = postRepository.findByUserIdAgg(template,userId, (long) page *size,size);
+        final Flux<Map> postFlux = postRepository.findByUserIdAgg(template, userId, (long) page * size, size)
+                .map(DateUtils::process);
         final Mono<Long> longMono = postRepository.countByUserIdAndStatus(userId, Status.NORMAL);
-        return Page.from(postFlux,longMono,page,size)
+        return Page.from(postFlux, longMono, page, size)
                 .map(ResponseResult::ok);
     }
 
@@ -75,9 +82,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Mono<ResponseResult> deletePostById(ObjectId postId, ObjectId userId) {
-        final Mono<UpdateResult> updateResultMono = postRepository.deleteById(template,postId, userId);
+        final Mono<UpdateResult> updateResultMono = postRepository.deleteById(template, postId, userId);
         return updateResultMono
-                .map(result -> result.wasAcknowledged()?
+                .map(result -> result.wasAcknowledged() ?
                         ResponseResult.ok(postId) : ResponseResult.of(Code.CLIENT_ERROR, "帖子不存在"));
     }
 
@@ -150,7 +157,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<ResponseResult> forward(ObjectId postId, ObjectId userId) {
 
-        return postRepository.findByIdAndStatus(postId,Status.NORMAL)
+        return postRepository.findByIdAndStatus(postId, Status.NORMAL)
 
                 .zipWhen(post -> {
 //                    Post post=tuple2.getT1();
@@ -174,9 +181,9 @@ public class PostServiceImpl implements PostService {
 
                     return postRepository.save(post1);
                 })
-                .zipWith(postRepository.countPostByForwardUidAndForwardPid(postId,userId))
+                .zipWith(postRepository.countPostByForwardUidAndForwardPid(postId, userId))
                 .flatMap(tuple -> {
-                    if(tuple.getT2()>0)
+                    if (tuple.getT2() > 0)
                         return Mono.just(true);
                     final Post post = tuple.getT1().getT1();
                     // 点转发帖子的id
@@ -185,20 +192,20 @@ public class PostServiceImpl implements PostService {
                     final ObjectId rid = post.getForwardPid();
                     // 增加sid帖子的点赞数
                     final Mono<UpdateResult> incForward = postRepository.incForward(template, sid);
-                    if(rid!=null)
+                    if (rid != null)
                         // 同时增加rid帖子的点赞数
                         return incForward
                                 .zipWith(postRepository.incForward(template, rid))
-                                .map(tuple2->{
-                                    if(tuple2.getT1().wasAcknowledged() && tuple2.getT2().wasAcknowledged())
+                                .map(tuple2 -> {
+                                    if (tuple2.getT1().wasAcknowledged() && tuple2.getT2().wasAcknowledged())
                                         return true;
                                     return false;
                                 });
-                   return incForward.map(UpdateResult::wasAcknowledged);
+                    return incForward.map(UpdateResult::wasAcknowledged);
                 })
-                .map(b -> b?
-                        ResponseResult.ok("转发成功"):
-                        ResponseResult.of(Code.CLIENT_ERROR,"转发失败"))
+                .map(b -> b ?
+                        ResponseResult.ok("转发成功") :
+                        ResponseResult.of(Code.CLIENT_ERROR, "转发失败"))
                 .defaultIfEmpty(ResponseResult.of(Code.PARAM_ERROR, "帖子不存在"));
 
 

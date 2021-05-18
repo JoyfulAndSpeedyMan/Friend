@@ -2,27 +2,29 @@ package top.pin90.server.service.impl;
 
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import top.pin90.common.dao.BsonManager;
+import top.pin90.common.po.post.PostComment;
+import top.pin90.common.po.post.PostCommentThumb;
 import top.pin90.common.pojo.Code;
 import top.pin90.common.pojo.Page;
 import top.pin90.common.pojo.ResponseResult;
+import top.pin90.common.pojo.Status;
+import top.pin90.server.dao.post.PostCommentDao;
 import top.pin90.server.dao.post.PostCommentRepository;
 import top.pin90.server.dao.post.PostCommentThumbRepository;
 import top.pin90.server.dao.post.PostRepository;
-import top.pin90.common.po.post.PostComment;
-import top.pin90.common.po.post.PostCommentThumb;
-import top.pin90.common.pojo.Status;
 import top.pin90.server.service.PostCommentService;
 
 import java.util.Date;
+import java.util.Map;
 
-import static org.springframework.data.mongodb.core.query.Criteria.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static top.pin90.server.utils.PageUtils.pageLimit;
 import static top.pin90.server.utils.PageUtils.sizeLimit;
 
@@ -31,29 +33,58 @@ public class PostCommentServiceImpl implements PostCommentService {
     final private PostCommentRepository postCommentRepository;
     final private PostCommentThumbRepository thumbRepository;
     final private PostRepository postRepository;
+    final private PostCommentDao postCommentDao;
     final private ReactiveMongoTemplate template;
-
-    public PostCommentServiceImpl(PostCommentRepository postCommentRepository, PostCommentThumbRepository thumbRepository, PostRepository postRepository, ReactiveMongoTemplate template) {
+    final private BsonManager bsonManager;
+    public PostCommentServiceImpl(PostCommentRepository postCommentRepository,
+                                  PostCommentThumbRepository thumbRepository,
+                                  PostRepository postRepository,
+                                  PostCommentDao postCommentDao, ReactiveMongoTemplate template, BsonManager bsonManager) {
         this.postCommentRepository = postCommentRepository;
         this.thumbRepository = thumbRepository;
         this.postRepository = postRepository;
+        this.postCommentDao = postCommentDao;
         this.template = template;
+        this.bsonManager = bsonManager;
     }
 
 
     @Override
-    public Mono<ResponseResult> findCommentByPostId(ObjectId postId, int page, int size) {
-        int page1= pageLimit(page);
-        int size1= sizeLimit(size);
-        final Flux<PostComment> comment = postCommentRepository.findPostCommentByPostIdAndStatus(postId, Status.NORMAL, PageRequest.of(page1, size1));
+    public Mono<ResponseResult> publishComment(ObjectId userId, ObjectId postId, String content) {
+        PostComment comment = PostComment.builder()
+                .userId(userId)
+                .postId(postId)
+                .content(content)
+                .thumb(0)
+                .status(Status.NORMAL)
+                .createTime(new Date())
+                .build();
+        postCommentRepository.save(comment);
+        return ResponseResult.monoOk("评论成功");
+    }
+
+    @Override
+    public Mono<ResponseResult> findCommentByPostId(ObjectId postId, int page, int size,ObjectId userId) {
+        int page1 = pageLimit(page);
+        int size1 = sizeLimit(size);
+        final Flux<Map> comment =
+                postCommentDao.findPostComment(
+                        postId, userId,Status.NORMAL, page1, size1);
         final Mono<Long> longMono = postCommentRepository.countByPostIdAndStatus(postId, Status.NORMAL);
         return Page.from(comment, longMono, page, size)
-                .map(pageResult -> {
-                    if (pageResult.empty())
-                        return ResponseResult.of(Code.CLIENT_ERROR, "帖子不存在");
-                    else
-                        return ResponseResult.ok(pageResult);
-                });
+                .map(ResponseResult::ok);
+    }
+
+    @Override
+    public Mono<ResponseResult> findAllPostCommentByPostIdAndStatus(ObjectId postId, int page, int size) {
+        int page1 = pageLimit(page);
+        int size1 = sizeLimit(size);
+        final Flux<Map> comment =
+                postCommentDao.findAllPostCommentByPostIdAndStatus(
+                        postId, Status.NORMAL, page1, size1);
+        final Mono<Long> longMono = postCommentRepository.countByPostIdAndStatus(postId, Status.NORMAL);
+        return Page.from(comment, longMono, page, size)
+                .map(ResponseResult::ok);
     }
 
     @Override
@@ -68,6 +99,7 @@ public class PostCommentServiceImpl implements PostCommentService {
                             .replyUserId(replyUserId)
                             .replyId(replyId)
                             .content(content)
+                            .status(Status.NORMAL)
                             .createTime(date)
                             .build();
                     return postComment;
@@ -133,7 +165,7 @@ public class PostCommentServiceImpl implements PostCommentService {
                             // 判断结果
                             .flatMap(tuple -> {
                                 if (tuple.getT1().getModifiedCount() == 1 && tuple.getT2() == 1)
-                                    return ResponseResult.monoOk("点赞成功");
+                                    return ResponseResult.monoOk("取消成功");
                                 return ResponseResult.toMono(Code.SERVER_EXE_ERROR, "点赞失败");
                             });
                 })

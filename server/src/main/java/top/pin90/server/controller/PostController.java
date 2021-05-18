@@ -66,7 +66,9 @@ public class PostController {
     }
 
     @PutMapping("/comment")
-    public Mono<ResponseResult> comment(ObjectId postId, @NotNull @Size(min = 1, max = 200) String content, @Token ObjectId userId) {
+    public Mono<ResponseResult> comment(ObjectId postId,
+                                        @NotNull @Size(min = 1, max = 200) String content,
+                                        @Token ObjectId userId) {
         return postService.comment(postId, content, userId);
     }
 

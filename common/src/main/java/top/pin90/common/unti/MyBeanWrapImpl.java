@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap{
+public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap {
     private final Object obj;
     private final boolean isMap;
 
@@ -17,14 +17,32 @@ public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap{
         this.isMap = obj instanceof Map;
         this.obj = obj;
     }
+
     @Override
     public Object get(String name) {
         if (isMap) {
             @SuppressWarnings("rawtypes")
             Map om = (Map) obj;
-            return om.get(name);
+            return getMapValue(om,name);
         }
         return getPropertyValue(name);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private Object getMapValue(Map map, String name) {
+        int i = name.indexOf('.');
+        if(i!=-1 && i<name.length()-1){
+            String endName = name.substring(i);
+            name = name.substring(0,i);
+            Object o = map.get(name);
+            if(o instanceof Map)
+                return getMapValue((Map) o,endName);
+            MyBeanWrap wrap = MyBeanWrap.wrap(o);
+            return wrap.get(name);
+        }
+        else {
+            return map.get(name);
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -37,6 +55,7 @@ public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap{
         setPropertyValue(name, value);
         return value;
     }
+
     @Override
     public Set<String> getAllPropertyNames() {
         if (isMap) {
@@ -55,6 +74,7 @@ public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap{
         }
         return result;
     }
+
     @Override
     public Map<String, Object> toMap(boolean saveNull) {
         if (isMap) {
@@ -74,6 +94,7 @@ public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap{
         }
         return result;
     }
+
     @Override
     public Map<String, Object> toMap() {
         return toMap(false);
@@ -87,6 +108,7 @@ public class MyBeanWrapImpl extends BeanWrapperImpl implements MyBeanWrap{
                 return true;
         return false;
     }
+
     @Override
     public Object getSource() {
         return obj;

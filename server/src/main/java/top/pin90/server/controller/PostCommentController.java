@@ -22,31 +22,43 @@ public class PostCommentController {
     }
 
     @GetMapping
-    public Mono<ResponseResult> findCommentByPostId(ObjectId postId, int page, int size){
-
-        return postCommentService.findCommentByPostId(postId, page, size);
+    public Mono<ResponseResult> findCommentByPostId(@RequestParam ObjectId postId,
+                                                    @RequestParam int page,
+                                                    @RequestParam int size,
+                                                    @Token ObjectId userId) {
+        return postCommentService.findCommentByPostId(postId, page, size, userId);
     }
+
+    @GetMapping("/all")
+    public Mono<ResponseResult> findAllPostComment(@RequestParam ObjectId postId,
+                                                   @RequestParam int page,
+                                                   @RequestParam int size) {
+        return postCommentService.findAllPostCommentByPostIdAndStatus(postId, page, size);
+    }
+
     @PutMapping("/reply")
     Mono<ResponseResult> replyComment(ObjectId postId,
                                       ObjectId replyUserId,
                                       ObjectId replyId,
                                       @NotBlank
-                                      @Size(min = 1,max = 400) String content,
-                                      @Token ObjectId userId){
-        return postCommentService.replyComment(postId, replyUserId, replyId, content,userId);
+                                      @Size(min = 1, max = 400) String content,
+                                      @Token ObjectId userId) {
+        return postCommentService.replyComment(postId, replyUserId, replyId, content, userId);
     }
+
     @DeleteMapping
-    Mono<ResponseResult> deleteComment(ObjectId commentId,@Token ObjectId userId){
+    Mono<ResponseResult> deleteComment(ObjectId commentId, @Token ObjectId userId) {
         return postCommentService.deleteComment(commentId, userId);
     }
 
     @PutMapping("/thumb")
-    Mono<ResponseResult> thumb(ObjectId commentId,@Token ObjectId userId){
+    Mono<ResponseResult> thumb(ObjectId commentId, @Token ObjectId userId) {
         return postCommentService.thumb(commentId, userId);
     }
+
     @DeleteMapping("/thumb")
-    Mono<ResponseResult> cancelThumb(ObjectId commentId,@Token ObjectId userId){
-        return postCommentService.deleteComment(commentId, userId);
+    Mono<ResponseResult> cancelThumb(ObjectId commentId, @Token ObjectId userId) {
+        return postCommentService.cancelThumb(commentId, userId);
     }
 
 
