@@ -12,6 +12,7 @@ import org.springframework.web.reactive.result.method.annotation.ArgumentResolve
 import top.pin90.common.unti.JwtUtils;
 import top.pin90.server.argument.resolver.FormDataArgumentResolver;
 import top.pin90.server.argument.resolver.UserIdArgumentResolver;
+import top.pin90.server.config.jwt.JWTokenConfig;
 
 @Configuration
 public class WebConfig implements WebFluxConfigurer {
@@ -22,15 +23,17 @@ public class WebConfig implements WebFluxConfigurer {
     private final JwtUtils jwtUtils;
     private final ReactiveMongoTemplate template;
     private final ReactiveAdapterRegistry adapterRegistry;
+    private final JWTokenConfig jwtTokenConfig;
     @Autowired
     public WebConfig(
             @Value("${auth.jwt.userIdKey}") String user_id_key,
             @Value("${auth.token.key}") String token_key,
-            JwtUtils jwtUtils, ReactiveMongoTemplate template) {
+            JwtUtils jwtUtils, ReactiveMongoTemplate template, JWTokenConfig jwTokenConfig) {
         this.USER_ID_KEY = user_id_key;
         this.TOKEN_KEY = token_key;
         this.jwtUtils = jwtUtils;
         this.template = template;
+        this.jwtTokenConfig = jwTokenConfig;
         this.adapterRegistry = ReactiveAdapterRegistry.getSharedInstance();
     }
 
@@ -41,7 +44,7 @@ public class WebConfig implements WebFluxConfigurer {
     }
     @Bean
     public UserIdArgumentResolver userIdArgumentResolver(){
-        return new UserIdArgumentResolver(jwtUtils, USER_ID_KEY,TOKEN_KEY, template);
+        return new UserIdArgumentResolver(jwtUtils, USER_ID_KEY,TOKEN_KEY, jwtTokenConfig, template);
     }
     @Bean
     public FormDataArgumentResolver formDataArgumentResolver(){

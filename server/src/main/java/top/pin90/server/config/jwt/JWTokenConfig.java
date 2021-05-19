@@ -12,4 +12,5 @@ public class JWTokenConfig {
      * token of http header key
      */
     private String key;
+    private String prefix;
 }

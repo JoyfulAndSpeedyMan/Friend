@@ -18,7 +18,7 @@ public class UserFriendRelationController {
 
     @GetMapping("")
     Mono<ResponseResult> getAllFriend(@Token ObjectId userId){
-        return null;
+        return friendRelationService.getAllFriend(userId);
     }
     @GetMapping("preAdd")
     Mono<ResponseResult> preAddFriend(@RequestParam ObjectId friendId,

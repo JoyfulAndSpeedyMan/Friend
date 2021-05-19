@@ -20,6 +20,7 @@ import top.pin90.common.exception.auth.UserVerifyException;
 import top.pin90.common.po.user.User;
 import top.pin90.common.po.user.UserStatus;
 import top.pin90.common.unti.JwtUtils;
+import top.pin90.server.config.jwt.JWTokenConfig;
 
 import java.util.List;
 
@@ -32,12 +33,14 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
     private final String USER_ID_KEY;
     // token 在 header中的key
     private final String tokenKey;
-
+    private final JWTokenConfig jwTokenConfig;
     private final ReactiveMongoTemplate template;
-    public UserIdArgumentResolver(JwtUtils jwtUtils, String user_id_key, String tokenKey, ReactiveMongoTemplate template) {
+
+    public UserIdArgumentResolver(JwtUtils jwtUtils, String user_id_key, String tokenKey, JWTokenConfig jwTokenConfig, ReactiveMongoTemplate template) {
         this.jwtUtils = jwtUtils;
-        this.USER_ID_KEY=user_id_key;
-        this.tokenKey=tokenKey;
+        this.USER_ID_KEY = user_id_key;
+        this.tokenKey = tokenKey;
+        this.jwTokenConfig = jwTokenConfig;
         this.template = template;
     }
 
@@ -54,25 +57,33 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
             final ServerHttpRequest request = exchange.getRequest();
             final HttpHeaders headers = request.getHeaders();
             final List<String> tokenList = headers.get(tokenKey);
-            if (tokenList==null){
-                if(required) {
+            if (tokenList == null) {
+                if (required) {
                     monoSink.error(new UserVerifyException("身份验证失败"));
                     return;
                 }
                 monoSink.success();
                 return;
             }
-            String key=tokenAnnotation.value();
-            if(Strings.isBlank(key))
-                key=USER_ID_KEY;
+            String key = tokenAnnotation.value();
+            if (Strings.isBlank(key))
+                key = USER_ID_KEY;
 
-            if(required){
+            if (required) {
                 if (tokenList.isEmpty())
                     monoSink.error(new UserVerifyException("身份验证失败"));
-                else{
-                    final String token = tokenList.get(0);
+                else {
+                    String token = tokenList.get(0);
+                    String prifix = jwTokenConfig.getPrefix();
+                    int i = token.indexOf(prifix);
+                    if (i == -1 || token.length() <= prifix.length()) {
+                        monoSink.error(new UserVerifyException("身份验证失败"));
+                        return;
+                    }
+
+                    token = token.substring(i+prifix.length());
                     DecodedJWT decodedJWT = jwtUtils.parseToken(token);
-                    if(jwtUtils.isRefreshToken(decodedJWT)){
+                    if (jwtUtils.isRefreshToken(decodedJWT)) {
                         monoSink.error(new UserVerifyException("身份验证失败"));
                         return;
                     }
@@ -85,14 +96,13 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
                     monoSink.success(new ObjectId(claim.asString()));
                 }
-            }
-            else {
+            } else {
                 if (tokenList.isEmpty())
                     monoSink.success();
-                else{
+                else {
                     final String token = tokenList.get(0);
                     DecodedJWT decodedJWT = jwtUtils.parseToken(token);
-                    if(jwtUtils.isRefreshToken(decodedJWT)){
+                    if (jwtUtils.isRefreshToken(decodedJWT)) {
                         monoSink.success();
                         return;
                     }
@@ -106,15 +116,15 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
         }).
                 subscribeOn(Schedulers.parallel())
                 .zipWhen(this::existUser)
-                .map(tuple->{
-                    if(tuple.getT2()){
+                .map(tuple -> {
+                    if (tuple.getT2()) {
                         return tuple.getT1();
                     }
-                    throw new UserVerifyException("用户"+tuple.getT1()+"不存在");
+                    throw new UserVerifyException("用户" + tuple.getT1() + "不存在");
                 });
     }
 
-    private Mono<Boolean> existUser(ObjectId userId){
+    private Mono<Boolean> existUser(ObjectId userId) {
         final Query query = Query.query(where("id").is(userId).and("status").is(UserStatus.NORMAL));
         final Mono<Boolean> exists = template.exists(query, User.class);
         return exists;

@@ -19,7 +19,8 @@ auth:
     userIdKey: userId
     iss: pin
   token:
-    key: token
+    key: Authorization
+    prefix: 'Bearer '
 user:
   login:
     accessValidTime: 864000

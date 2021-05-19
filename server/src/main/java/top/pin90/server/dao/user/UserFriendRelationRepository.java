@@ -23,7 +23,9 @@ public interface UserFriendRelationRepository extends ReactiveMongoRepository<Us
      * @param pageable 分页参数
      * @return 请求列表
      */
-    Flux<UserFriendRelation> findBySuid(ObjectId suid, Pageable pageable);
+    Flux<UserFriendRelation> findBySuidAndStatus(ObjectId suid,String status, Pageable pageable);
+
+    Flux<UserFriendRelation> findBySuidAndStatus(ObjectId suid,String status);
 
     /**
      * 获取请求总数量
