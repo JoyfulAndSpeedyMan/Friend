@@ -73,6 +73,10 @@
     preserveNullAndEmptyArrays: true
   }
 }, {
+  $sort: {
+    createTime: -1
+  }
+},{
   $project: {
     userId: 1,
     nickname: '$user.nickname',

@@ -156,11 +156,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Mono<ResponseResult> forward(ObjectId postId, ObjectId userId) {
-
         return postRepository.findByIdAndStatus(postId, Status.NORMAL)
-
                 .zipWhen(post -> {
-//                    Post post=tuple2.getT1();
                     final Date date = new Date();
                     final Post.PostBuilder builder = Post.builder()
                             .userId(userId)
@@ -168,7 +165,8 @@ public class PostServiceImpl implements PostService {
                             .comment(0)
                             .forward(0)
                             .createTime(date)
-                            .updateTime(date);
+                            .updateTime(date)
+                            .status(Status.NORMAL);
                     if (post.getForwardPid() != null)
                         builder
                                 .forwardUid(post.getForwardUid())
@@ -181,7 +179,7 @@ public class PostServiceImpl implements PostService {
 
                     return postRepository.save(post1);
                 })
-                .zipWith(postRepository.countPostByForwardUidAndForwardPid(postId, userId))
+                .zipWith(postRepository.countPostByForwardUidAndForwardPid(userId,postId))
                 .flatMap(tuple -> {
                     if (tuple.getT2() > 0)
                         return Mono.just(true);
@@ -190,10 +188,10 @@ public class PostServiceImpl implements PostService {
                     final ObjectId sid = post.getId();
                     // 根帖子的id
                     final ObjectId rid = post.getForwardPid();
-                    // 增加sid帖子的点赞数
+                    // 增加sid帖子的转发数
                     final Mono<UpdateResult> incForward = postRepository.incForward(template, sid);
                     if (rid != null)
-                        // 同时增加rid帖子的点赞数
+                        // 同时增加rid帖子的转发数
                         return incForward
                                 .zipWith(postRepository.incForward(template, rid))
                                 .map(tuple2 -> {

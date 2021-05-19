@@ -105,8 +105,9 @@ public class PostCommentServiceImpl implements PostCommentService {
                     return postComment;
                 })
                 .flatMap(postCommentRepository::save)
+                .flatMap(p->postRepository.incComment(template,postId))
                 .flatMap(ResponseResult::monoOk)
-                .switchIfEmpty(ResponseResult.toMono(Code.PARAM_ERROR, "评论不存在"));
+                .switchIfEmpty(ResponseResult.toMono(Code.PARAM_ERROR, "评论或帖子不存在"));
     }
 
     @Override
