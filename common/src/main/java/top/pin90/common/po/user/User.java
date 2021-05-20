@@ -27,8 +27,11 @@ public class User {
     private ObjectId id;
     private String phone;
     private String password;
+    private String sex;
     private String nickname;
     private String avatar;
+    private String resume;
+    private String profile;
     /**
      * 学生认证信息
      */
@@ -40,11 +43,14 @@ public class User {
     /**
      * 用户角色
      */
-    private int role;
+    private UserRole role;
     /**
      * 用户状态
      */
     private String status;
+
+    private Date birthday;
+
     private Date createTime;
     private Date updateTime;
     @Data

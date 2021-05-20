@@ -21,6 +21,16 @@
     fId: '$friend._id',
     fPhone: "$friend.phone",
     fNickname: "$friend.nickname",
+    fNoteName:"$noteName",
+    friendName: {
+      $switch: {
+        branches: [
+          { case: { $and : ["$noteName",1]}, then: "$noteName"},
+          { case: { $and : ["$friend.nickname",1]}, then: "$friend.nickname"},
+        ],
+        default: "$friend.phone"
+      }
+    },
     fAvatar: "$friend.avatar",
     createTime: 1
 

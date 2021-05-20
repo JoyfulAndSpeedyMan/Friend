@@ -100,7 +100,6 @@ public class FormDataArgumentResolver implements HandlerMethodArgumentResolver {
                     return Mono.just(value);
                 })
                 .map(value -> {
-                    System.out.println(name+": "+value);
                     if (value instanceof String) {
                         Object o = stringToObject((String) value, parameterType);
                         return o;
@@ -114,7 +113,6 @@ public class FormDataArgumentResolver implements HandlerMethodArgumentResolver {
                         return value;
                     }
                 })
-                .defaultIfEmpty("哈哈")
                 .onErrorContinue((e,o)->{
                     e.printStackTrace();
                 });

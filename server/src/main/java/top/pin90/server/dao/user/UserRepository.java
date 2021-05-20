@@ -8,10 +8,13 @@ import top.pin90.common.po.user.User;
 
 public interface UserRepository extends ReactiveSortingRepository<User, ObjectId> {
 
+    @Query(value = "{ phone: '?0'}",
+            fields = "{ phone: 1,nickname:1,sex:1,avatar:1,status: 1 ,birthday:1 ,profile:1, createTime:1}"
+    )
     Mono<User> findFirstByPhone(String phone);
 
     @Query(value = "{_id: ObjectId('?0')}",
-            fields =  "{_id: 0,phone: 1,nickname: 1,avatar: 1,status: 1,createTime: 1}")
+            fields = "{ phone: 1,nickname:1,sex:1,avatar:1,status: 1 ,birthday:1 ,profile:1, createTime:1}")
     Mono<User> getBaseInfoById(ObjectId id);
     /*
     @Query("{nickname:?0}")

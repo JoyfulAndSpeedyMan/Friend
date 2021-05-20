@@ -69,4 +69,11 @@ public interface UserFriendRelationService {
      */
     Mono<ResponseResult> deleteFriend(ObjectId friendId,ObjectId userId);
 
+    /**
+     * 根据手机号查找用户
+     * @param phone
+     * @param userId
+     * @return
+     */
+    Mono<ResponseResult> findUserByPhone(String phone,ObjectId userId);
 }

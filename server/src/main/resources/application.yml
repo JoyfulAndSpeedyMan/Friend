@@ -23,7 +23,7 @@ auth:
     prefix: 'Bearer '
 user:
   login:
-    accessValidTime: 864000
+    accessValidTime: 155520000
     refreshValidTime: 155520000
     code:
       codeType: code6

@@ -52,7 +52,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
     public Mono<ResponseResult> getAllFriend(ObjectId userId) {
         return userFriendRelationDao.findAllFriend(userId)
                 .collectList()
-                .map(l-> PinyinUtils.spellGroup(l,"fNickname"))
+                .map(l-> PinyinUtils.spellGroup(l,"friendName"))
                 .map(ResponseResult::ok);
     }
 
@@ -95,6 +95,9 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                             builder.requestMsg(content);
                         else if (setting.getFriReqVerMode().equals(FriendReqVerMode.QUESTION)) {
                             // TODO: 2020/12/30 请求问题验证
+                        }
+                        else if(setting.getFriReqVerMode().equals(FriendReqVerMode.NONE)){
+                            // TODO: 2021/5/20 无需验证，直接通过请求
                         }
                         return friendRelationRepository.save(builder.build())
                                 .map(relation -> {
@@ -197,7 +200,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
         final Update update = updateStatus(UserFriendRelationStatus.REJECT);
         if (StringUtils.hasText(content))
             update.set("resMsg", content);
-        return updateFriendRelation(update, friendId, userId);
+        return updateFriendRelation(update,userId , friendId);
     }
 
     @Override
@@ -229,16 +232,24 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
 
     @Override
     public Mono<ResponseResult> deleteFriend(ObjectId friendId, ObjectId userId) {
-        return updateFriendRelation(updateStatus(UserFriendRelationStatus.DELETE), friendId, userId);
+        return updateFriendRelation(updateStatus(UserFriendRelationStatus.DELETE),userId , friendId);
+    }
+
+    @Override
+    public Mono<ResponseResult> findUserByPhone(String phone, ObjectId userId) {
+        return userRepository.findFirstByPhone(phone)
+                .map(ResponseResult::ok)
+                .switchIfEmpty(ResponseResult.toMono(Code.PARAM_ERROR,"找不到该用户"));
     }
 
     private Update updateStatus(String status) {
         return Update.update("status", status);
     }
 
-    private Mono<ResponseResult> updateFriendRelation(Update update, ObjectId fid, ObjectId uid) {
+
+    private Mono<ResponseResult> updateFriendRelation(Update update, ObjectId fuid, ObjectId suid) {
         final Mono<UpdateResult> updateResultMono = template.updateFirst(
-                Query.query(where("fuid").is(fid).and("suid").is(uid)),
+                Query.query(where("fuid").is(fuid).and("suid").is(suid)),
                 update,
                 UserFriendRelation.class);
         return updateResultMono

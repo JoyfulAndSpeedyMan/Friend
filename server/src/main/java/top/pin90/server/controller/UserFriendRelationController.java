@@ -7,6 +7,9 @@ import top.pin90.common.annotation.Token;
 import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.service.UserFriendRelationService;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+
 @RestController
 @RequestMapping("/user/friend")
 public class UserFriendRelationController {
@@ -63,5 +66,15 @@ public class UserFriendRelationController {
 
     }
 
+    @GetMapping("/findByPhone")
+    Mono<ResponseResult> findUserByPhone(
+            @RequestParam
+            @NotBlank(message = "不能为空")
+            @Pattern(regexp = "^(?:\\+?86)?1(?:3\\d{3}|5[^4\\D]\\d{2}|8\\d{3}|7(?:[01356789]\\d{2}|4(?:0\\d|1[0-2]|9\\d))|9[189]\\d{2}|6[567]\\d{2}|4[579]\\d{2})\\d{6}$",
+                    message = "格式错误")
+            String phone,
+            @Token ObjectId userId){
+        return friendRelationService.findUserByPhone(phone, userId);
+    }
 
 }

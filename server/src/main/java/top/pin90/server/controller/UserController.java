@@ -63,6 +63,10 @@ public class UserController {
         return userService.getUserBaseInfo(userId);
     }
 
+    @GetMapping("baseInfo2")
+    public Mono<ResponseResult> getBaseInfoByFriendId(@RequestParam ObjectId fid,@Token ObjectId userId){
+        return userService.getUserBaseInfo(fid);
+    }
 
     @GetMapping("/refreshToken")
     public Mono<ResponseResult> refreshToken(String refreshToken){

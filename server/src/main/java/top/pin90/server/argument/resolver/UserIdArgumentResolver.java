@@ -74,6 +74,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
                     monoSink.error(new UserVerifyException("身份验证失败"));
                 else {
                     String token = tokenList.get(0);
+                    token = token.trim();
                     String prifix = jwTokenConfig.getPrefix();
                     int i = token.indexOf(prifix);
                     if (i == -1 || token.length() <= prifix.length()) {
@@ -81,7 +82,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
                         return;
                     }
 
-                    token = token.substring(i+prifix.length());
+                    token = token.substring(i + prifix.length());
                     DecodedJWT decodedJWT = jwtUtils.parseToken(token);
                     if (jwtUtils.isRefreshToken(decodedJWT)) {
                         monoSink.error(new UserVerifyException("身份验证失败"));
@@ -100,7 +101,8 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
                 if (tokenList.isEmpty())
                     monoSink.success();
                 else {
-                    final String token = tokenList.get(0);
+                    String token = tokenList.get(0);
+                    token = token.trim();
                     DecodedJWT decodedJWT = jwtUtils.parseToken(token);
                     if (jwtUtils.isRefreshToken(decodedJWT)) {
                         monoSink.success();
