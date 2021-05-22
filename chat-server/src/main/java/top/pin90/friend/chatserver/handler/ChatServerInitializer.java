@@ -9,7 +9,8 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import top.pin90.common.unti.spring.SpringBeanFactory;
-import top.pin90.friend.chatserver.protocol.req.ReqProto;
+import top.pin90.friend.chatserver.protocol.WSMsg;
+import top.pin90.friend.chatserver.service.ChatService;
 import top.pin90.friend.chatserver.service.UserService;
 
 public class ChatServerInitializer extends ChannelInitializer<Channel> {
@@ -23,10 +24,12 @@ public class ChatServerInitializer extends ChannelInitializer<Channel> {
                 // byteToWebSocketFrame
                 .addLast(new WebFrameHandler())
                 // Protobuf
-                .addLast(new ProtobufDecoder(ReqProto.BaseReq.getDefaultInstance()))
+                .addLast(new ProtobufDecoder(WSMsg.Msg.getDefaultInstance()))
                 .addLast(new ProtobufEncoder());
 
-        MyHandler myHandler = new MyHandler(SpringBeanFactory.getBean(UserService.class));
+        MyHandler myHandler = new MyHandler(
+                SpringBeanFactory.getBean(UserService.class),
+                SpringBeanFactory.getBean(ChatService.class));
         myHandler.init();
         ch.pipeline().addLast(myHandler);
     }

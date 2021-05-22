@@ -5,12 +5,17 @@ spring:
   application:
     name: chat-top.pin90.friend.routeserverapi.service
   redis:
-    host: 192.168.0.111
+    host: localhost
+  data:
+     mongodb:
+      uri: mongodb://localhost:27017/FriendDev?ssl=false
+      database: FriendDev
 chat:
   server:
     port: 1000${id}
 zookeeper:
-  connectString: 192.168.0.111:2181
+  connectString: 192.168.110.128:2181
+
 auth:
   jwt:
     secret: 123456
@@ -24,5 +29,11 @@ logging:
       pin90:
         friend:
           chatserver: debug
+    org:
+      springframework:
+        data:
+          mongodb:
+            core: debug
+
 
 

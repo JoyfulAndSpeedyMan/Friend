@@ -1,9 +1,8 @@
 package top.pin90.friend.chatserver.protocol.res;
 
-public class ResResult {
-    public static final int OK=1;
-    public static final int ERROR=2;
+import top.pin90.friend.chatserver.protocol.WsCode;
 
+public class WsResCode extends WsCode {
     public static final int CLIENT_ERROR=10; // 用户端错误
 
     public static final int PARAM_ERROR=30; // 参数错误

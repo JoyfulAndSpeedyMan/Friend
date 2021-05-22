@@ -4,11 +4,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
-import top.pin90.friend.chatserver.protocol.req.ReqOps;
-import top.pin90.friend.chatserver.protocol.req.ReqProto;
-import top.pin90.friend.chatserver.protocol.res.ResOps;
-import top.pin90.friend.chatserver.protocol.res.ResProto;
-import top.pin90.friend.chatserver.protocol.res.ResResult;
+import top.pin90.friend.chatserver.OtherOpsRouter;
+import top.pin90.friend.chatserver.protocol.WSMsg;
+import top.pin90.friend.chatserver.protocol.WsOps;
+import top.pin90.friend.chatserver.protocol.req.WsReqOps;
+import top.pin90.friend.chatserver.protocol.res.WsResCode;
+import top.pin90.friend.chatserver.protocol.res.WsResOps;
+import top.pin90.friend.chatserver.service.ChatService;
 import top.pin90.friend.chatserver.service.UserService;
 
 import javax.annotation.PostConstruct;
@@ -16,26 +18,30 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-import static top.pin90.friend.chatserver.service.RuntimeData.channelMapId;
+import static top.pin90.friend.chatserver.server.RuntimeData.channelMapId;
+
 @Slf4j
-public class MyHandler extends SimpleChannelInboundHandler<ReqProto.BaseReq> {
+public class MyHandler extends SimpleChannelInboundHandler<WSMsg.Msg> {
 
     // 已连接，但是还未进行身份验证任务队列队列
     private final static DelayQueue<ConnectNotLoginTask> delayQueue = new DelayQueue<>();
     private final UserService userService;
-
-    public MyHandler(UserService userService) {
+    private final ChatService chatService;
+    public MyHandler(UserService userService, ChatService chatService) {
         this.userService = userService;
+        this.chatService = chatService;
     }
 
     private static class ConnectNotLoginTask implements Delayed {
 
         private final Channel channel;
         private final long trigger;
+        private final long enterTime = System.currentTimeMillis();
 
         ConnectNotLoginTask(Channel channel, long trigger) {
             this.channel = channel;
-            this.trigger = trigger;
+            this.trigger = trigger + enterTime;
+
         }
 
         public Channel getChannel() {
@@ -54,7 +60,7 @@ public class MyHandler extends SimpleChannelInboundHandler<ReqProto.BaseReq> {
 
         @Override
         public long getDelay(TimeUnit unit) {
-            return unit.convert(trigger, TimeUnit.NANOSECONDS);
+            return unit.convert(trigger - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
         }
     }
 
@@ -64,8 +70,9 @@ public class MyHandler extends SimpleChannelInboundHandler<ReqProto.BaseReq> {
             while (true) {
                 try {
                     ConnectNotLoginTask take = delayQueue.take();
-                    Channel channel = take.getChannel();
-                    if (!channelMapId.containsKey(channel)) {
+                    if (!channelMapId.containsKey(take.getChannel())) {
+                        Channel channel = take.getChannel();
+                        log.info("close channel {} ,because it not login", channel.id());
                         channel.close();
                     }
                 } catch (InterruptedException e) {
@@ -77,34 +84,41 @@ public class MyHandler extends SimpleChannelInboundHandler<ReqProto.BaseReq> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ReqProto.BaseReq req) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, WSMsg.Msg req) throws Exception {
         Channel channel = ctx.channel();
         int ops = req.getOps();
         switch (ops) {
-            case ReqOps.PING:
-                ResProto.BaseRes res = ResProto.BaseRes
+            case WsOps.PING:
+                WSMsg.Msg res = WSMsg.Msg
                         .newBuilder()
-                        .setResult(ResResult.OK)
-                        .setOps(ResOps.PONG)
+                        .setCode(WsResCode.OK)
+                        .setOps(WsResOps.PONG)
+                        .setContent(req.getMsg())
                         .build();
                 ctx.writeAndFlush(res);
                 log.debug("PING , channel {}", channel.id());
                 break;
-            case ReqOps.PONG:
+            case WsOps.PONG:
                 log.debug("PONG , channel {}", channel.id());
                 break;
-            case ReqOps.LOGIN:
+            case WsReqOps.LOGIN:
                 userService.login(ctx, req);
                 log.debug("LOGIN , user {}", req.getContent());
                 break;
-            case ReqOps.LOGOUT:
+            case WsReqOps.LOGOUT:
+                userService.logout(ctx);
                 log.debug("LOGOUT , user {}", "phone");
                 break;
-            case ReqOps.SEND_CHAT_MSG:
+            case WsReqOps.SEND_CHAT_MSG:
+                chatService.sendChatMsg(ctx,req);
                 log.debug("SEND_CHAT_MSG , {} to {}", "phone", "phone");
                 break;
+            case WsOps.OTHER:
+                log.debug("OTHER , target: {}", req.getTarget());
+                OtherOpsRouter.route(ctx, req);
+                break;
             default:
-
+                log.debug("UNKNOWN ops");
         }
         System.out.println(req);
     }
@@ -113,7 +127,7 @@ public class MyHandler extends SimpleChannelInboundHandler<ReqProto.BaseReq> {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
         Channel channel = ctx.channel();
-        delayQueue.offer(new ConnectNotLoginTask(channel, 5L * 1000 * 1000 * 1000));
+        delayQueue.offer(new ConnectNotLoginTask(channel, 5L * 1000));
         log.debug("channel {} connected", channel.id());
     }
 

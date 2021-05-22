@@ -1,21 +1,21 @@
 package top.pin90.friend.chatserver;
 
 import org.junit.jupiter.api.Test;
-import top.pin90.friend.chatserver.protocol.req.ReqOps;
+import top.pin90.friend.chatserver.protocol.req.WsReqOps;
 
 public class TestOther {
     @Test
     public void testSwitch(){
         int ops=5;
         switch (ops){
-            case ReqOps.PING:
+            case WsReqOps.PING:
                 System.out.println("PING");
                 break;
-            case ReqOps.PONG:
+            case WsReqOps.PONG:
                 System.out.println("PONG");
 
                 break;
-            case ReqOps.LOGIN:
+            case WsReqOps.LOGIN:
                 System.out.println("LOGIN");
                 break;
             default:

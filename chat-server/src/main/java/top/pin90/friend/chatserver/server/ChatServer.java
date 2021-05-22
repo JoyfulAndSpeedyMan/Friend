@@ -1,4 +1,4 @@
-package top.pin90.friend.chatserver;
+package top.pin90.friend.chatserver.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -52,10 +52,9 @@ public class ChatServer {
     /**
      * 启动初始化
      *
-     * @throws InterruptedException
      */
     @PostConstruct
-    public void start() throws InterruptedException {
+    public void start() {
         EventLoopGroup boss = new NioEventLoopGroup();
         EventLoopGroup work = new NioEventLoopGroup();
 

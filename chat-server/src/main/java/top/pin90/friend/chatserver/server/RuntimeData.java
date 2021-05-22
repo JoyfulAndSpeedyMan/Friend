@@ -1,4 +1,4 @@
-package top.pin90.friend.chatserver.service;
+package top.pin90.friend.chatserver.server;
 
 import io.netty.channel.Channel;
 import lombok.AllArgsConstructor;
@@ -37,8 +37,10 @@ public class RuntimeData {
     }
 
     public static void logout(Channel channel) {
-        ObjectId id = channelMapId.remove(channel);
-        idMapChannel.remove(id);
+        if(channelMapId.containsKey(channel)) {
+            ObjectId id = channelMapId.remove(channel);
+            idMapChannel.remove(id);
+        }
     }
 
     public static void put(Channel channel, ObjectId userId) {

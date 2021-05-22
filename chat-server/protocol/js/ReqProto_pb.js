@@ -1,4 +1,4 @@
-// source: ReqProto.proto
+// source: Proto.proto
 /**
  * @fileoverview
  * @enhanceable

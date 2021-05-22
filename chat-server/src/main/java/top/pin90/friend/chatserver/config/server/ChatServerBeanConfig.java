@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import top.pin90.common.pojo.info.ChatServerInfo;
-import top.pin90.friend.chatserver.ChatServer;
+import top.pin90.friend.chatserver.server.ChatServer;
 import top.pin90.friend.chatserver.listener.ChatServerStartListener;
 import top.pin90.friend.chatserver.listener.ChatServerStopListener;
 import top.pin90.common.unti.zookeeper.ChatServerZkUtils;

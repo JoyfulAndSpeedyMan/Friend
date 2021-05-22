@@ -21,7 +21,7 @@ public class ZookeeperBeanConfig {
         client = CuratorFrameworkFactory.builder()
                 .connectString(properties.getConnectString())
                 .retryPolicy(retryPolicy)
-                .connectionTimeoutMs(6000)
+                .connectionTimeoutMs(15000)
                 .sessionTimeoutMs(6000)
                 // etc. etc.
                 .build();

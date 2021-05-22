@@ -12,6 +12,5 @@ message BaseRes {
   optional int32 type = 5;    // 内容的类型
   optional string content = 6;  // 字符串内容
   optional bytes bytesContent = 7; // 字节内容
-  optional string uri = 10;      // uri路径
 }
 
