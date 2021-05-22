@@ -2,6 +2,7 @@ package top.pin90.server.dao.user;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,7 +17,30 @@ public interface UserFriendRelationRepository extends ReactiveMongoRepository<Us
      */
     Mono<UserFriendRelation> findByFuidAndSuid(ObjectId fuid,ObjectId suid);
 
-
+    /**
+     * 获取好友的双向关系
+     * @param fuid
+     * @param suid
+     * @return
+     */
+    @Query(value = "    {\n" +
+            "        $or:[\n" +
+            "            {\n" +
+            "                $and:[\n" +
+            "                    {fuid: ObjectId('?0')},\n" +
+            "                    {suid: ObjectId('?1')}\n" +
+            "                ]\n" +
+            "            },\n" +
+            "            {\n" +
+            "                $and:[\n" +
+            "                    {fuid: ObjectId('?1')},\n" +
+            "                    {suid: ObjectId('?0')}\n" +
+            "                ]\n" +
+            "            }\n" +
+            "        ]\n" +
+            "\n" +
+            "    }")
+    Flux<UserFriendRelation> findUserFriendRelation(ObjectId fuid,ObjectId suid);
     /**
      * 获取好友请求
      * @param suid 被请求的用户

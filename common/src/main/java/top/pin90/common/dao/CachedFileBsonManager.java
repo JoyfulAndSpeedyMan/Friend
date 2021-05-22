@@ -59,7 +59,7 @@ public class CachedFileBsonManager implements BsonManager {
     }
 
     @Override
-    public String getBson(String path, Object... param) {
+    public String getBsonWithVar(String path, Object... param) {
         String bson = getBson(path);
         Matcher matcher = placeholder.matcher(bson);
         StringBuffer sb = new StringBuffer();

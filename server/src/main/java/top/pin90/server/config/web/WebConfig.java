@@ -1,4 +1,4 @@
-package top.pin90.server.config;
+package top.pin90.server.config.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,11 +19,12 @@ public class WebConfig implements WebFluxConfigurer {
     // 用户id在jwt中的key
     private final String USER_ID_KEY;
     // token 在 header中的key
-    private final String TOKEN_KEY ;
+    private final String TOKEN_KEY;
     private final JwtUtils jwtUtils;
     private final ReactiveMongoTemplate template;
     private final ReactiveAdapterRegistry adapterRegistry;
     private final JWTokenConfig jwtTokenConfig;
+
     @Autowired
     public WebConfig(
             @Value("${auth.jwt.userIdKey}") String user_id_key,
@@ -42,17 +43,21 @@ public class WebConfig implements WebFluxConfigurer {
         configurer.addCustomResolver(userIdArgumentResolver());
         configurer.addCustomResolver(formDataArgumentResolver());
     }
+
     @Bean
-    public UserIdArgumentResolver userIdArgumentResolver(){
-        return new UserIdArgumentResolver(jwtUtils, USER_ID_KEY,TOKEN_KEY, jwtTokenConfig, template);
+    public UserIdArgumentResolver userIdArgumentResolver() {
+        return new UserIdArgumentResolver(jwtUtils, USER_ID_KEY, TOKEN_KEY, jwtTokenConfig, template);
     }
+
     @Bean
-    public FormDataArgumentResolver formDataArgumentResolver(){
+    public FormDataArgumentResolver formDataArgumentResolver() {
         return new FormDataArgumentResolver();
     }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("GET","POST","PUT","DELETE");
+                .allowedMethods("GET", "POST", "PUT", "DELETE");
     }
+
 }

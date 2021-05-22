@@ -6,6 +6,8 @@ import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import reactor.core.publisher.Mono;
 import top.pin90.common.po.user.User;
 
+import java.util.Map;
+
 public interface UserRepository extends ReactiveSortingRepository<User, ObjectId> {
 
     @Query(value = "{ phone: '?0'}",
@@ -16,6 +18,10 @@ public interface UserRepository extends ReactiveSortingRepository<User, ObjectId
     @Query(value = "{_id: ObjectId('?0')}",
             fields = "{ phone: 1,nickname:1,sex:1,avatar:1,status: 1 ,birthday:1 ,profile:1, createTime:1}")
     Mono<User> getBaseInfoById(ObjectId id);
+
+    @Query(value = "{_id: ObjectId('?0')}",
+            fields = "{ phone: 1,nickname:1,sex:1,avatar:1,status: 1 ,birthday:1 ,profile:1, createTime:1}")
+    Mono<Map> getBaseMapInfoById(ObjectId id);
     /*
     @Query("{nickname:?0}")
     Flux<User> findByJson(String nickname);

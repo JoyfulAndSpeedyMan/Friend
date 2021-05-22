@@ -1,4 +1,4 @@
-package top.pin90.common.unti;
+package top.pin90.common.unti.pinyin;
 
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinCaseType;
@@ -6,6 +6,7 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 import net.sourceforge.pinyin4j.format.HanyuPinyinVCharType;
 import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombination;
+import top.pin90.common.unti.MyBeanWrap;
 
 import java.util.*;
 
@@ -19,8 +20,7 @@ public class PinyinUtils {
         format.setVCharType(HanyuPinyinVCharType.WITH_V);
     }
 
-    public static Map<String, String> changeChinesePinyin(String chinese) throws BadHanyuPinyinOutputFormatCombination {
-        Map<String, String> pinyin = new HashMap<>();
+    public static PinYinResult changeChinesePinyin(String chinese) {
 
         StringBuilder fullPinyin = new StringBuilder();
         StringBuilder simplePinyin = new StringBuilder();
@@ -41,9 +41,7 @@ public class PinyinUtils {
                 simplePinyin.append(c);
             }
         }
-        pinyin.put("fullPinyin", fullPinyin.toString());
-        pinyin.put("simplePinyin", simplePinyin.toString().toUpperCase());
-        return pinyin;
+        return new PinYinResult(fullPinyin.toString(),simplePinyin.toString().toUpperCase());
     }
 
     public static <T> Map<Character, ArrayList<T>> spellGroup(List<T> list, String index) {
@@ -64,11 +62,7 @@ public class PinyinUtils {
                 continue;
             }
             else {
-                try {
-                    code = changeChinesePinyin((String) o).get("simplePinyin");
-                } catch (BadHanyuPinyinOutputFormatCombination e) {
-                    throw new RuntimeException("解析汉字错误",e);
-                }
+                code = changeChinesePinyin((String) o).getSimplePinyin();
             }
             if(code.isEmpty())
                 continue;
@@ -91,7 +85,7 @@ public class PinyinUtils {
         }
         map.put('#', new ArrayList<>());
         for (String str : list) {
-            String code = changeChinesePinyin(str).get("simplePinyin");
+            String code = changeChinesePinyin(str).getSimplePinyin();
             char c = code.charAt(0);
 
             ArrayList<String> strings;

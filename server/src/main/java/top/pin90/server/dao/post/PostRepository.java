@@ -32,7 +32,7 @@ public interface PostRepository extends ReactiveSortingRepository<Post, ObjectId
 
     default Flux<Map> findAllPost(ReactiveMongoTemplate template, BsonManager bsonManager, long skip, int limit) {
         return Flux.defer(() -> {
-            String bson = bsonManager.getBson("post/findAllPost", skip, limit);
+            String bson = bsonManager.getBsonWithVar("post/findAllPost", skip, limit);
             final Aggregation aggregation = newAggregation(new JsonOperation(bson));
             return template.aggregate(aggregation, Post.class, Map.class);
         });

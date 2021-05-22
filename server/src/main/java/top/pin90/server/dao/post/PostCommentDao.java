@@ -22,14 +22,14 @@ public class PostCommentDao {
     }
 
     public Flux<Map> findPostComment(ObjectId postId, ObjectId userId, String status, int page, int size) {
-        String bson = bsonManager.getBson("postComment/findPostComment", postId, status, userId, page, size);
+        String bson = bsonManager.getBsonWithVar("postComment/findPostComment", postId, status, userId, page, size);
         JsonOperation operation = new JsonOperation(bson);
         return template.aggregate(Aggregation.newAggregation(operation), PostComment.class, Map.class);
     }
 
     public Flux<Map> findAllPostCommentByPostIdAndStatus(ObjectId postId, String status,
                                                          int page, int size) {
-        String bson = bsonManager.getBson("postComment/findPostComment", postId, status, page, size);
+        String bson = bsonManager.getBsonWithVar("postComment/findPostComment", postId, status, page, size);
         JsonOperation operation = new JsonOperation(bson);
         return template.aggregate(Aggregation.newAggregation(operation), PostComment.class, Map.class);
     }

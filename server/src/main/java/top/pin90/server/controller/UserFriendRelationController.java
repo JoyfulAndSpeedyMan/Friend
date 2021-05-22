@@ -31,10 +31,8 @@ public class UserFriendRelationController {
     }
 
     @GetMapping("request")
-    public Mono<ResponseResult> getFriendRequest(@Token ObjectId userId,
-                                                 @RequestParam int page,
-                                                 @RequestParam int size){
-        return friendRelationService.getFriendRequest(userId, page, size);
+    public Mono<ResponseResult> getFriendRequest(@Token ObjectId userId){
+        return friendRelationService.getFriendRequest(userId);
     }
 
     @PutMapping("request")
@@ -75,6 +73,12 @@ public class UserFriendRelationController {
             String phone,
             @Token ObjectId userId){
         return friendRelationService.findUserByPhone(phone, userId);
+    }
+
+    @GetMapping("/friendInfo")
+    Mono<ResponseResult> getFriendInfo(@Token ObjectId userId,
+                                       @RequestParam ObjectId friendId){
+        return friendRelationService.getFriendInfo(userId, friendId);
     }
 
 }

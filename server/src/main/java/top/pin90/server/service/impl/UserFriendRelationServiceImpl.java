@@ -2,7 +2,6 @@ package top.pin90.server.service.impl;
 
 import com.mongodb.client.result.UpdateResult;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -10,23 +9,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import top.pin90.common.pojo.Code;
-import top.pin90.common.pojo.Page;
-import top.pin90.common.pojo.ResponseResult;
-import top.pin90.common.unti.PinyinUtils;
-import top.pin90.server.dao.user.UserFriendRelationDaoImpl;
-import top.pin90.server.dao.user.UserFriendRelationRepository;
-import top.pin90.server.dao.user.UserFriendSettingRepository;
-import top.pin90.server.dao.user.UserRepository;
 import top.pin90.common.po.user.FriendReqVerMode;
 import top.pin90.common.po.user.UserFriendRelation;
 import top.pin90.common.po.user.UserFriendRelationStatus;
+import top.pin90.common.pojo.Code;
+import top.pin90.common.pojo.ResponseResult;
+import top.pin90.common.unti.function.SingleMyTuple2;
+import top.pin90.common.unti.pinyin.PinyinUtils;
+import top.pin90.server.dao.user.UserFriendRelationDao;
+import top.pin90.server.dao.user.UserFriendRelationRepository;
+import top.pin90.server.dao.user.UserFriendSettingRepository;
+import top.pin90.server.dao.user.UserRepository;
 import top.pin90.server.service.UserFriendRelationService;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
-import static org.springframework.data.mongodb.core.query.Criteria.*;
-import static top.pin90.server.utils.PageUtils.*;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 @Service
 public class UserFriendRelationServiceImpl implements UserFriendRelationService {
@@ -34,13 +34,14 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
     private final UserFriendRelationRepository friendRelationRepository;
     private final UserFriendSettingRepository friendSettingRepository;
     private final ReactiveMongoTemplate template;
-    private final UserFriendRelationDaoImpl userFriendRelationDao;
+    private final UserFriendRelationDao userFriendRelationDao;
+
 
     public UserFriendRelationServiceImpl(UserRepository userRepository,
                                          UserFriendRelationRepository friendRelationRepository,
                                          UserFriendSettingRepository friendSettingRepository,
                                          ReactiveMongoTemplate template,
-                                         UserFriendRelationDaoImpl userFriendRelationDao) {
+                                         UserFriendRelationDao userFriendRelationDao) {
         this.userRepository = userRepository;
         this.friendRelationRepository = friendRelationRepository;
         this.friendSettingRepository = friendSettingRepository;
@@ -52,7 +53,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
     public Mono<ResponseResult> getAllFriend(ObjectId userId) {
         return userFriendRelationDao.findAllFriend(userId)
                 .collectList()
-                .map(l-> PinyinUtils.spellGroup(l,"friendName"))
+                .map(l -> PinyinUtils.spellGroup(l, "friendName"))
                 .map(ResponseResult::ok);
     }
 
@@ -63,16 +64,9 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
     }
 
     @Override
-    public Mono<ResponseResult> getFriendRequest(ObjectId userId, int page, int size) {
-        int page1 = pageLimit(page);
-        int size1 = sizeLimit(size);
-
-        final PageRequest pageRequest = PageRequest.of(page1, size1);
-        final Flux<UserFriendRelation> relationFlux =
-                friendRelationRepository.findBySuidAndStatus(userId,UserFriendRelationStatus.REQUEST,pageRequest);
-        final Mono<Long> longMono = friendRelationRepository.countBySuid(userId);
-
-        return Page.from(relationFlux, longMono, page, size)
+    public Mono<ResponseResult> getFriendRequest(ObjectId userId) {
+        Flux<Map> allFriend = userFriendRelationDao.findFriendRequest(userId);
+        return allFriend.collectList()
                 .map(ResponseResult::ok);
     }
 
@@ -95,8 +89,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                             builder.requestMsg(content);
                         else if (setting.getFriReqVerMode().equals(FriendReqVerMode.QUESTION)) {
                             // TODO: 2020/12/30 请求问题验证
-                        }
-                        else if(setting.getFriReqVerMode().equals(FriendReqVerMode.NONE)){
+                        } else if (setting.getFriReqVerMode().equals(FriendReqVerMode.NONE)) {
                             // TODO: 2021/5/20 无需验证，直接通过请求
                         }
                         return friendRelationRepository.save(builder.build())
@@ -107,55 +100,76 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                                 });
                     });
 
-                    return friendRelationRepository.findByFuidAndSuid(userId, friendId)
+                    return friendRelationRepository.findUserFriendRelation(userId, friendId)
+                            .collectList()
                             // 不是第一次添加好友进行的操作
-                            .flatMap(relation -> {
-                                Mono<UserFriendRelation> relationMono = Mono.just(relation);
-                                final String status = relation.getStatus();
+                            .flatMap(rels -> {
+                                if (rels.isEmpty())
+                                    return save;
+                                SingleMyTuple2<UserFriendRelation> tr = sortByUserAndFriendId(rels, userId, friendId);
+                                UserFriendRelation relation1 = tr.getT1();
+                                Mono<UserFriendRelation> relationMono = Mono.just(relation1);
+                                final String status = relation1.getStatus();
                                 // 如果是在黑名单中，则直接更新为正常状态
                                 if (status.equals(UserFriendRelationStatus.BLACKLIST)) {
-                                    relation.setStatus(UserFriendRelationStatus.NORMAL);
-                                    relation.setUpdateTime(new Date());
-                                    relationMono = friendRelationRepository.save(relation);
+                                    relation1.setStatus(UserFriendRelationStatus.NORMAL);
+                                    relation1.setUpdateTime(new Date());
+                                    relationMono = friendRelationRepository.save(relation1);
                                 }
                                 // 如果为请求状态，则推送好友请求
                                 else if (status.equals(UserFriendRelationStatus.REQUEST)) {
-                                    relation.setUpdateTime(new Date());
-                                    relationMono = friendRelationRepository.save(relation);
+                                    relation1.setUpdateTime(new Date());
+                                    relation1.setRequestMsg(content);
+                                    relationMono = friendRelationRepository.save(relation1);
                                     // TODO: 2020/12/30 推送好友请求
                                 }
                                 // 如果为拒绝状态，则推送好友请求并设置为请求状态
                                 else if (status.equals(UserFriendRelationStatus.REJECT)) {
-                                    relation.setStatus(UserFriendRelationStatus.REQUEST);
-                                    relation.setUpdateTime(new Date());
-                                    relationMono = friendRelationRepository.save(relation);
+                                    relation1.setRequestMsg(content);
+                                    relation1.setStatus(UserFriendRelationStatus.REQUEST);
+                                    relation1.setUpdateTime(new Date());
+                                    relationMono = friendRelationRepository.save(relation1);
                                 }
                                 // 如果为删除状态，则根据是否被对方删除来判断是否推送消息
-                                else if (status.equals(UserFriendRelationStatus.DELETE)) {
-                                    relationMono = friendRelationRepository.findByFuidAndSuid(friendId,userId)
-                                            .flatMap(r -> {
+                                else {
+                                    int size = rels.size();
+                                    if (status.equals(UserFriendRelationStatus.DELETE)) {
+                                        relationMono = friendRelationRepository.findByFuidAndSuid(friendId, userId)
+                                                .flatMap(r -> {
+                                                    // 如果对方也已经删除，则需要推送好友请求
+                                                    if (r.getStatus().equals(UserFriendRelationStatus.DELETE) || !tr.hasT2()) {
+                                                        relation1.setLastStatus(null);
+                                                        relation1.setStatus(UserFriendRelationStatus.REQUEST);
+                                                        relation1.setUpdateTime(new Date());
+                                                        relation1.setRequestMsg(content);
+                                                        // TODO: 2020/12/30 推送好友请求
+
+                                                        return friendRelationRepository.save(relation1);
+                                                    }
+                                                    // 否则直接设置为正常状态
+                                                    relation1.setStatus(UserFriendRelationStatus.NORMAL);
+                                                    return friendRelationRepository.save(relation1);
+                                                })
                                                 // 如果对方也已经删除，则需要推送好友请求
-                                                if (r.getStatus().equals(UserFriendRelationStatus.DELETE)) {
-                                                    relation.setLastStatus(null);
-                                                    relation.setStatus(UserFriendRelationStatus.REQUEST);
-
+                                                .switchIfEmpty(Mono.defer(() -> {
+                                                    relation1.setLastStatus(null);
+                                                    relation1.setStatus(UserFriendRelationStatus.REQUEST);
+                                                    relation1.setRequestMsg(content);
+                                                    relation1.setUpdateTime(new Date());
                                                     // TODO: 2020/12/30 推送好友请求
-
-                                                    return friendRelationRepository.save(relation);
-                                                }
-                                                // 否则直接设置为正常状态
-                                                relation.setStatus(UserFriendRelationStatus.NORMAL);
-                                                return friendRelationRepository.save(relation);
-                                            })
-                                            // 如果对方也已经删除，则需要推送好友请求
-                                            .switchIfEmpty(Mono.defer(() -> {
-                                                relation.setLastStatus(null);
-                                                relation.setStatus(UserFriendRelationStatus.REQUEST);
-                                                // TODO: 2020/12/30 推送好友请求
-                                                return friendRelationRepository.save(relation);
-                                            }));
-                                } else if (status.equals(UserFriendRelationStatus.NORMAL)) {
-                                    // 正常状态，啥也不做
+                                                    return friendRelationRepository.save(relation1);
+                                                }));
+                                    } else if (status.equals(UserFriendRelationStatus.NORMAL)) {
+                                        // 已经被对方删除了
+                                        if (!tr.hasT2() || tr.getT2().getStatus().equals(UserFriendRelationStatus.DELETE)) {
+                                            relation1.setLastStatus(relation1.getStatus());
+                                            relation1.setStatus(UserFriendRelationStatus.REQUEST);
+                                            relation1.setUpdateTime(new Date());
+                                            relation1.setRequestMsg(content);
+                                            relationMono = friendRelationRepository.save(relation1);
+                                        }
+                                        // 正常状态，啥也不做
+                                    }
                                 }
                                 return relationMono;
                             })
@@ -166,13 +180,27 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                 .switchIfEmpty(ResponseResult.toMono(Code.USER_VERITY_ERROR, "添加失败"));
     }
 
+    private SingleMyTuple2<UserFriendRelation> sortByUserAndFriendId(List<UserFriendRelation> rels, ObjectId userId, ObjectId friendId) {
+        if (rels.isEmpty())
+            return new SingleMyTuple2<>();
+        if (rels.size() == 1)
+            return new SingleMyTuple2<>(rels.get(0), null);
+        UserFriendRelation r1 = rels.get(0);
+        UserFriendRelation r2 = rels.get(1);
+        if (r1.getFuid().equals(userId))
+            return new SingleMyTuple2<>(r1, r2);
+        else
+            return new SingleMyTuple2<>(r2, r1);
+
+    }
+
     @Override
     public Mono<ResponseResult> acceptFriend(ObjectId friendId, ObjectId userId) {
         final Mono<UpdateResult> updateResultMono = template.updateFirst(
                 Query.query(
                         where("fuid").is(friendId)
-                        .and("suid").is(userId)
-                        .and("status").is(UserFriendRelationStatus.REQUEST)),
+                                .and("suid").is(userId)
+                                .and("status").is(UserFriendRelationStatus.REQUEST)),
                 Update.update("status", UserFriendRelationStatus.NORMAL),
                 UserFriendRelation.class);
         final Mono<UserFriendRelation> userFriendRelationMono = Mono.defer(() -> {
@@ -184,7 +212,14 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                     .createTime(date)
                     .updateTime(date)
                     .build();
-            return friendRelationRepository.save(userFriendRelation);
+            return friendRelationRepository.findByFuidAndSuid(userId, friendId)
+                    .flatMap(r -> {
+                        r.setLastStatus(r.getStatus());
+                        r.setStatus(UserFriendRelationStatus.NORMAL);
+                        r.setUpdateTime(new Date());
+                        return friendRelationRepository.save(r);
+                    })
+                    .switchIfEmpty(friendRelationRepository.save(userFriendRelation));
         });
         return updateResultMono.flatMap(result -> {
             if (result.getMatchedCount() == 1) {
@@ -200,7 +235,7 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
         final Update update = updateStatus(UserFriendRelationStatus.REJECT);
         if (StringUtils.hasText(content))
             update.set("resMsg", content);
-        return updateFriendRelation(update,userId , friendId);
+        return updateFriendRelation(update, userId, friendId);
     }
 
     @Override
@@ -232,14 +267,21 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
 
     @Override
     public Mono<ResponseResult> deleteFriend(ObjectId friendId, ObjectId userId) {
-        return updateFriendRelation(updateStatus(UserFriendRelationStatus.DELETE),userId , friendId);
+        return updateFriendRelation(updateStatus(UserFriendRelationStatus.DELETE), userId, friendId);
     }
 
     @Override
     public Mono<ResponseResult> findUserByPhone(String phone, ObjectId userId) {
         return userRepository.findFirstByPhone(phone)
                 .map(ResponseResult::ok)
-                .switchIfEmpty(ResponseResult.toMono(Code.PARAM_ERROR,"找不到该用户"));
+                .switchIfEmpty(ResponseResult.toMono(Code.PARAM_ERROR, "找不到该用户"));
+    }
+
+    @Override
+    public Mono<ResponseResult> getFriendInfo(ObjectId userId, ObjectId friendId) {
+        return userFriendRelationDao.findFriendInfo(userId, friendId)
+                .map(ResponseResult::ok)
+                .defaultIfEmpty(ResponseResult.of(Code.PARAM_ERROR, "用户不存在"));
     }
 
     private Update updateStatus(String status) {
@@ -261,4 +303,5 @@ public class UserFriendRelationServiceImpl implements UserFriendRelationService 
                     return ResponseResult.of(Code.SERVER_EXE_ERROR, "操作失败");
                 });
     }
+
 }

@@ -1,0 +1,45 @@
+[{
+    $match: {
+        fuid: ObjectId('#{userId}'),
+        suid: ObjectId('#{friendId}')
+    }
+}, {
+    $lookup: {
+        from: 'User',
+        localField: 'suid',
+        foreignField: '_id',
+        as: 'friend'
+    }
+}, {
+    $unwind: {
+        path: '$friend'
+    }
+}, {
+    $project: {
+        _id: 1,
+        fId: '$suid',
+        requestMsg: 1,
+        fNickname: '$friend.nickname',
+        friendName: {
+            $switch: {
+                branches: [{
+                        case: {
+                            $and: ["$noteName", 1]
+                        },
+                        then: "$noteName"
+                    },
+                    {
+                        case: {
+                            $and: ["$friend.nickname", 1]
+                        },
+                        then: "$friend.nickname"
+                    },
+                ],
+                default: "$friend.phone"
+            }
+        },
+        fAvatar: '$friend.avatar',
+        fSex: '$friend.sex',
+        fPhone: '$friend.phone'
+    }
+}]

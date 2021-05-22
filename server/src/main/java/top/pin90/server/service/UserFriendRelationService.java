@@ -29,7 +29,7 @@ public interface UserFriendRelationService {
      */
     Mono<ResponseResult> addFriend(ObjectId friendId,String content,ObjectId userId);
 
-    Mono<ResponseResult> getFriendRequest(ObjectId userId,int page,int size);
+    Mono<ResponseResult> getFriendRequest(ObjectId userId);
     /**
      * 通过好友请求
      * @param friendId 好友的Id
@@ -76,4 +76,7 @@ public interface UserFriendRelationService {
      * @return
      */
     Mono<ResponseResult> findUserByPhone(String phone,ObjectId userId);
+
+    Mono<ResponseResult> getFriendInfo(ObjectId userId ,ObjectId friendId);
+
 }
