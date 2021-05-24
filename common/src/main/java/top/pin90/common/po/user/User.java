@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.Email;
 import java.util.Date;
@@ -49,9 +50,12 @@ public class User {
      */
     private String status;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     private Date birthday;
 
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     private Date createTime;
+    @DateTimeFormat(pattern="yyyy-MM-dd hh:mm:ss")
     private Date updateTime;
     @Data
     static public class Student{

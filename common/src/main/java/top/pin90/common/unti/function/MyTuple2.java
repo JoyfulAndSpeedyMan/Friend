@@ -1,8 +1,8 @@
 package top.pin90.common.unti.function;
 
 public class MyTuple2<T1, T2> {
-    final T1 t1;
-    final T2 t2;
+    public T1 t1;
+    public T2 t2;
 
     public MyTuple2() {
         this(null, null);

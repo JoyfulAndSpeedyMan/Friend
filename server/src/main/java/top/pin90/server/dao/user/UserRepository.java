@@ -2,13 +2,13 @@ package top.pin90.server.dao.user;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveSortingRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Mono;
 import top.pin90.common.po.user.User;
 
 import java.util.Map;
 
-public interface UserRepository extends ReactiveSortingRepository<User, ObjectId> {
+public interface UserRepository extends ReactiveMongoRepository<User, ObjectId> {
 
     @Query(value = "{ phone: '?0'}",
             fields = "{ phone: 1,nickname:1,sex:1,avatar:1,status: 1 ,birthday:1 ,profile:1, createTime:1}"

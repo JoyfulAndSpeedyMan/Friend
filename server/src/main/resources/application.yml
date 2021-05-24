@@ -5,6 +5,9 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017/FriendDev?ssl=false
       database: FriendDev
+    redis:
+      repositories:
+        enabled: false
   webflux:
     static-path-pattern: /resources/**
   application:
@@ -36,3 +39,8 @@ logging:
     top:
       pin90:
         server: trace
+    org:
+      springframework:
+        data:
+          mongodb:
+            core: debug

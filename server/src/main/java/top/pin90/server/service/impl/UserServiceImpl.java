@@ -11,10 +11,7 @@ import reactor.util.function.Tuple2;
 import top.pin90.common.exception.auth.UserVerifyException;
 import top.pin90.common.pojo.Code;
 import top.pin90.common.pojo.ResponseResult;
-import top.pin90.common.unti.JwtUtils;
-import top.pin90.common.unti.MyBeanUtils;
-import top.pin90.common.unti.NumFormat;
-import top.pin90.common.unti.SmsUtils;
+import top.pin90.common.unti.*;
 import top.pin90.server.config.user.UserLoginCodeConfig;
 import top.pin90.server.config.user.UserLoginConfig;
 import top.pin90.server.config.user.UserLoginNewConfig;
@@ -272,6 +269,30 @@ public class UserServiceImpl implements UserService {
                 .map(ResponseResult::ok)
                 .switchIfEmpty(Mono.fromSupplier(() -> ResponseResult.of(Code.USER_NOT_EXIST, "用户不存在")));
     }
+
+    @Override
+    public Mono<ResponseResult> updateUserInfo(User user) {
+        return userRepository.findById(user.getId())
+                .flatMap(u->{
+                    String[] updateFields={
+                            "avatar",
+                            "sex",
+                            "birthday",
+                            "profile"
+                    };
+                    MyBeanWrap oldInfo  = MyBeanWrap.wrap(u);
+                    MyBeanWrap newInfo = MyBeanWrap.wrap(user);
+                    for (String name : updateFields) {
+                        Object o = newInfo.get(name);
+                        if(o!=null)
+                            oldInfo.set(name,o);
+                    }
+                    u.setUpdateTime(new Date());
+                    return userRepository.save(u);
+                })
+                .map(u-> ResponseResult.ok("更新成功",user));
+    }
+
 
     private String getLoginCacheKey(String phone) {
         return userLoginConfig.getLoginCacheKey() + phone;

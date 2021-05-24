@@ -8,7 +8,7 @@ import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.service.ChatServerService;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/chat/server")
 public class ChatServerController {
     final ChatServerService chatServerService;
 
@@ -17,12 +17,14 @@ public class ChatServerController {
     }
 
     @GetMapping("/all")
-    public Mono<ResponseResult>getAll(){
+    public Mono<ResponseResult> getAll() {
         return chatServerService.getAllServer();
     }
+
     @GetMapping("/get")
-    public Mono<ResponseResult> get(){
+    public Mono<ResponseResult> get() {
         return chatServerService.getServer();
 
     }
+
 }

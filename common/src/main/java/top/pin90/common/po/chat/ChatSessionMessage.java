@@ -28,11 +28,15 @@ public class ChatSessionMessage {
      */
     private ObjectId chatSessionId;
     /**
+     * 消息的发布者
+     */
+    private ObjectId promulgator;
+    /**
      * 消息的类型（二进制数据用路径表示）
      */
     private Integer type;
     /**
-     * 消息的内容人
+     * 消息的内容
      */
     private String content;
     /**

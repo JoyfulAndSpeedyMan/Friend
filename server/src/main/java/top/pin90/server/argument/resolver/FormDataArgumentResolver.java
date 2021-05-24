@@ -7,10 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
@@ -36,6 +33,7 @@ public class FormDataArgumentResolver implements HandlerMethodArgumentResolver {
         exclude.add(RequestParam.class);
         exclude.add(PathVariable.class);
         exclude.add(RequestBody.class);
+        exclude.add(ModelAttribute.class);
         exclude.add(Token.class);
     }
 

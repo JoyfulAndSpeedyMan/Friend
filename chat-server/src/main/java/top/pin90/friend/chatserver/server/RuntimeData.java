@@ -33,7 +33,10 @@ public class RuntimeData {
     }
 
     public static Channel getChannel(ObjectId userId) {
-        return getCacheInfo(userId).getChannel();
+        UserInfoCache cacheInfo = getCacheInfo(userId);
+        if(cacheInfo!=null)
+            return cacheInfo.getChannel();
+        return null;
     }
 
     public static void logout(Channel channel) {

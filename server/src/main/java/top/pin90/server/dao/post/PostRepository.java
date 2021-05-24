@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.data.repository.reactive.ReactiveSortingRepository;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import top.pin90.common.dao.BsonManager;
@@ -22,7 +22,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.*;
 import static org.springframework.data.mongodb.core.aggregation.ConditionalOperators.IfNull.ifNull;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
-public interface PostRepository extends ReactiveSortingRepository<Post, ObjectId> {
+public interface PostRepository extends ReactiveMongoRepository<Post, ObjectId> {
 
     Flux<Post> findAllByStatus(String status, Pageable pageable);
 

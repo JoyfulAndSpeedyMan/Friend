@@ -7,19 +7,27 @@ import java.util.List;
 
 /**
  * 分页返回视图
+ *
  * @param <T>
  */
 public class Page<T> {
-    private long total;
-    private long totalPages = -1;
-    private int page;
-    private int pageSize;
+    private Long total;
+    private Long totalPages = -1L;
+    private Integer page;
+    private Integer pageSize;
     private List<T> list;
 
 
+    public static <T> Mono<Page<T>> from(Flux<T> objectFlux, int page, int pageSize) {
+        return objectFlux
+                .collectList()
+                .map(list -> {
+                    return new Page<T>(null, page, pageSize, list);
+                });
+    }
 
     public static <T> Mono<Page<T>> from(Flux<T> objectFlux, Mono<Long> totalMono) {
-        return from(objectFlux,totalMono, -1,-1);
+        return from(objectFlux, totalMono, -1, -1);
     }
 
 
@@ -35,33 +43,36 @@ public class Page<T> {
     }
 
 
-    private Page(long total, List<T> list) {
+    private Page(Long total, List<T> list) {
         this(total, -1, -1, list);
     }
 
-    public Page(long total, int page, int pageSize, List<T> list) {
+    public Page(Long total, Integer page, Integer pageSize, List<T> list) {
         this.total = total;
         this.page = page;
         this.pageSize = pageSize;
         this.list = list;
     }
 
-    public boolean empty(){
+    public boolean empty() {
         return list.isEmpty();
     }
-    public long getTotalPages() {
+
+    public Long getTotalPages() {
+        if(total==null)
+            return 0L;
         return total / pageSize + 1;
     }
 
-    public long getTotal() {
+    public Long getTotal() {
         return total;
     }
 
-    public int getPage() {
+    public Integer getPage() {
         return page;
     }
 
-    public int getPageSize() {
+    public Integer getPageSize() {
         return pageSize;
     }
 

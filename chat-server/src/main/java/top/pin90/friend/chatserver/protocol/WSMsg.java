@@ -96,6 +96,64 @@ public final class WSMsg {
 
     /**
      * <pre>
+     *消息的唯一标识符
+     * </pre>
+     *
+     * <code>optional string msg_id = 6;</code>
+     * @return Whether the msgId field is set.
+     */
+    boolean hasMsgId();
+    /**
+     * <pre>
+     *消息的唯一标识符
+     * </pre>
+     *
+     * <code>optional string msg_id = 6;</code>
+     * @return The msgId.
+     */
+    java.lang.String getMsgId();
+    /**
+     * <pre>
+     *消息的唯一标识符
+     * </pre>
+     *
+     * <code>optional string msg_id = 6;</code>
+     * @return The bytes for msgId.
+     */
+    com.google.protobuf.ByteString
+        getMsgIdBytes();
+
+    /**
+     * <pre>
+     * 扩展字段
+     * </pre>
+     *
+     * <code>optional string extend = 7;</code>
+     * @return Whether the extend field is set.
+     */
+    boolean hasExtend();
+    /**
+     * <pre>
+     * 扩展字段
+     * </pre>
+     *
+     * <code>optional string extend = 7;</code>
+     * @return The extend.
+     */
+    java.lang.String getExtend();
+    /**
+     * <pre>
+     * 扩展字段
+     * </pre>
+     *
+     * <code>optional string extend = 7;</code>
+     * @return The bytes for extend.
+     */
+    com.google.protobuf.ByteString
+        getExtendBytes();
+
+    /**
+     * <pre>
      * 内容的类型
      * </pre>
      *
@@ -147,7 +205,7 @@ public final class WSMsg {
      * 字节内容
      * </pre>
      *
-     * <code>optional bytes bytesContent = 20;</code>
+     * <code>optional bytes bytes_content = 20;</code>
      * @return Whether the bytesContent field is set.
      */
     boolean hasBytesContent();
@@ -156,7 +214,7 @@ public final class WSMsg {
      * 字节内容
      * </pre>
      *
-     * <code>optional bytes bytesContent = 20;</code>
+     * <code>optional bytes bytes_content = 20;</code>
      * @return The bytesContent.
      */
     com.google.protobuf.ByteString getBytesContent();
@@ -176,6 +234,8 @@ public final class WSMsg {
     private Msg() {
       msg_ = "";
       target_ = "";
+      msgId_ = "";
+      extend_ = "";
       content_ = "";
       bytesContent_ = com.google.protobuf.ByteString.EMPTY;
     }
@@ -233,19 +293,31 @@ public final class WSMsg {
               target_ = bs;
               break;
             }
-            case 80: {
+            case 50: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000010;
+              msgId_ = bs;
+              break;
+            }
+            case 58: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000020;
+              extend_ = bs;
+              break;
+            }
+            case 80: {
+              bitField0_ |= 0x00000040;
               type_ = input.readInt32();
               break;
             }
             case 122: {
               com.google.protobuf.ByteString bs = input.readBytes();
-              bitField0_ |= 0x00000020;
+              bitField0_ |= 0x00000080;
               content_ = bs;
               break;
             }
             case 162: {
-              bitField0_ |= 0x00000040;
+              bitField0_ |= 0x00000100;
               bytesContent_ = input.readBytes();
               break;
             }
@@ -436,6 +508,126 @@ public final class WSMsg {
       }
     }
 
+    public static final int MSG_ID_FIELD_NUMBER = 6;
+    private volatile java.lang.Object msgId_;
+    /**
+     * <pre>
+     *消息的唯一标识符
+     * </pre>
+     *
+     * <code>optional string msg_id = 6;</code>
+     * @return Whether the msgId field is set.
+     */
+    @java.lang.Override
+    public boolean hasMsgId() {
+      return ((bitField0_ & 0x00000010) != 0);
+    }
+    /**
+     * <pre>
+     *消息的唯一标识符
+     * </pre>
+     *
+     * <code>optional string msg_id = 6;</code>
+     * @return The msgId.
+     */
+    @java.lang.Override
+    public java.lang.String getMsgId() {
+      java.lang.Object ref = msgId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          msgId_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *消息的唯一标识符
+     * </pre>
+     *
+     * <code>optional string msg_id = 6;</code>
+     * @return The bytes for msgId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getMsgIdBytes() {
+      java.lang.Object ref = msgId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        msgId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int EXTEND_FIELD_NUMBER = 7;
+    private volatile java.lang.Object extend_;
+    /**
+     * <pre>
+     * 扩展字段
+     * </pre>
+     *
+     * <code>optional string extend = 7;</code>
+     * @return Whether the extend field is set.
+     */
+    @java.lang.Override
+    public boolean hasExtend() {
+      return ((bitField0_ & 0x00000020) != 0);
+    }
+    /**
+     * <pre>
+     * 扩展字段
+     * </pre>
+     *
+     * <code>optional string extend = 7;</code>
+     * @return The extend.
+     */
+    @java.lang.Override
+    public java.lang.String getExtend() {
+      java.lang.Object ref = extend_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          extend_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 扩展字段
+     * </pre>
+     *
+     * <code>optional string extend = 7;</code>
+     * @return The bytes for extend.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getExtendBytes() {
+      java.lang.Object ref = extend_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        extend_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     public static final int TYPE_FIELD_NUMBER = 10;
     private int type_;
     /**
@@ -448,7 +640,7 @@ public final class WSMsg {
      */
     @java.lang.Override
     public boolean hasType() {
-      return ((bitField0_ & 0x00000010) != 0);
+      return ((bitField0_ & 0x00000040) != 0);
     }
     /**
      * <pre>
@@ -475,7 +667,7 @@ public final class WSMsg {
      */
     @java.lang.Override
     public boolean hasContent() {
-      return ((bitField0_ & 0x00000020) != 0);
+      return ((bitField0_ & 0x00000080) != 0);
     }
     /**
      * <pre>
@@ -523,26 +715,26 @@ public final class WSMsg {
       }
     }
 
-    public static final int BYTESCONTENT_FIELD_NUMBER = 20;
+    public static final int BYTES_CONTENT_FIELD_NUMBER = 20;
     private com.google.protobuf.ByteString bytesContent_;
     /**
      * <pre>
      * 字节内容
      * </pre>
      *
-     * <code>optional bytes bytesContent = 20;</code>
+     * <code>optional bytes bytes_content = 20;</code>
      * @return Whether the bytesContent field is set.
      */
     @java.lang.Override
     public boolean hasBytesContent() {
-      return ((bitField0_ & 0x00000040) != 0);
+      return ((bitField0_ & 0x00000100) != 0);
     }
     /**
      * <pre>
      * 字节内容
      * </pre>
      *
-     * <code>optional bytes bytesContent = 20;</code>
+     * <code>optional bytes bytes_content = 20;</code>
      * @return The bytesContent.
      */
     @java.lang.Override
@@ -577,12 +769,18 @@ public final class WSMsg {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, target_);
       }
       if (((bitField0_ & 0x00000010) != 0)) {
-        output.writeInt32(10, type_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, msgId_);
       }
       if (((bitField0_ & 0x00000020) != 0)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 15, content_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, extend_);
       }
       if (((bitField0_ & 0x00000040) != 0)) {
+        output.writeInt32(10, type_);
+      }
+      if (((bitField0_ & 0x00000080) != 0)) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 15, content_);
+      }
+      if (((bitField0_ & 0x00000100) != 0)) {
         output.writeBytes(20, bytesContent_);
       }
       unknownFields.writeTo(output);
@@ -609,13 +807,19 @@ public final class WSMsg {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, target_);
       }
       if (((bitField0_ & 0x00000010) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, msgId_);
+      }
+      if (((bitField0_ & 0x00000020) != 0)) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, extend_);
+      }
+      if (((bitField0_ & 0x00000040) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(10, type_);
       }
-      if (((bitField0_ & 0x00000020) != 0)) {
+      if (((bitField0_ & 0x00000080) != 0)) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(15, content_);
       }
-      if (((bitField0_ & 0x00000040) != 0)) {
+      if (((bitField0_ & 0x00000100) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(20, bytesContent_);
       }
@@ -653,6 +857,16 @@ public final class WSMsg {
       if (hasTarget()) {
         if (!getTarget()
             .equals(other.getTarget())) return false;
+      }
+      if (hasMsgId() != other.hasMsgId()) return false;
+      if (hasMsgId()) {
+        if (!getMsgId()
+            .equals(other.getMsgId())) return false;
+      }
+      if (hasExtend() != other.hasExtend()) return false;
+      if (hasExtend()) {
+        if (!getExtend()
+            .equals(other.getExtend())) return false;
       }
       if (hasType() != other.hasType()) return false;
       if (hasType()) {
@@ -696,6 +910,14 @@ public final class WSMsg {
         hash = (37 * hash) + TARGET_FIELD_NUMBER;
         hash = (53 * hash) + getTarget().hashCode();
       }
+      if (hasMsgId()) {
+        hash = (37 * hash) + MSG_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getMsgId().hashCode();
+      }
+      if (hasExtend()) {
+        hash = (37 * hash) + EXTEND_FIELD_NUMBER;
+        hash = (53 * hash) + getExtend().hashCode();
+      }
       if (hasType()) {
         hash = (37 * hash) + TYPE_FIELD_NUMBER;
         hash = (53 * hash) + getType();
@@ -705,7 +927,7 @@ public final class WSMsg {
         hash = (53 * hash) + getContent().hashCode();
       }
       if (hasBytesContent()) {
-        hash = (37 * hash) + BYTESCONTENT_FIELD_NUMBER;
+        hash = (37 * hash) + BYTES_CONTENT_FIELD_NUMBER;
         hash = (53 * hash) + getBytesContent().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
@@ -849,12 +1071,16 @@ public final class WSMsg {
         bitField0_ = (bitField0_ & ~0x00000004);
         target_ = "";
         bitField0_ = (bitField0_ & ~0x00000008);
-        type_ = 0;
+        msgId_ = "";
         bitField0_ = (bitField0_ & ~0x00000010);
-        content_ = "";
+        extend_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
-        bytesContent_ = com.google.protobuf.ByteString.EMPTY;
+        type_ = 0;
         bitField0_ = (bitField0_ & ~0x00000040);
+        content_ = "";
+        bitField0_ = (bitField0_ & ~0x00000080);
+        bytesContent_ = com.google.protobuf.ByteString.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -900,15 +1126,23 @@ public final class WSMsg {
         }
         result.target_ = target_;
         if (((from_bitField0_ & 0x00000010) != 0)) {
-          result.type_ = type_;
           to_bitField0_ |= 0x00000010;
         }
+        result.msgId_ = msgId_;
         if (((from_bitField0_ & 0x00000020) != 0)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.content_ = content_;
+        result.extend_ = extend_;
         if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.type_ = type_;
           to_bitField0_ |= 0x00000040;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.content_ = content_;
+        if (((from_bitField0_ & 0x00000100) != 0)) {
+          to_bitField0_ |= 0x00000100;
         }
         result.bytesContent_ = bytesContent_;
         result.bitField0_ = to_bitField0_;
@@ -976,11 +1210,21 @@ public final class WSMsg {
           target_ = other.target_;
           onChanged();
         }
+        if (other.hasMsgId()) {
+          bitField0_ |= 0x00000010;
+          msgId_ = other.msgId_;
+          onChanged();
+        }
+        if (other.hasExtend()) {
+          bitField0_ |= 0x00000020;
+          extend_ = other.extend_;
+          onChanged();
+        }
         if (other.hasType()) {
           setType(other.getType());
         }
         if (other.hasContent()) {
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000080;
           content_ = other.content_;
           onChanged();
         }
@@ -1303,6 +1547,222 @@ public final class WSMsg {
         return this;
       }
 
+      private java.lang.Object msgId_ = "";
+      /**
+       * <pre>
+       *消息的唯一标识符
+       * </pre>
+       *
+       * <code>optional string msg_id = 6;</code>
+       * @return Whether the msgId field is set.
+       */
+      public boolean hasMsgId() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <pre>
+       *消息的唯一标识符
+       * </pre>
+       *
+       * <code>optional string msg_id = 6;</code>
+       * @return The msgId.
+       */
+      public java.lang.String getMsgId() {
+        java.lang.Object ref = msgId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            msgId_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *消息的唯一标识符
+       * </pre>
+       *
+       * <code>optional string msg_id = 6;</code>
+       * @return The bytes for msgId.
+       */
+      public com.google.protobuf.ByteString
+          getMsgIdBytes() {
+        java.lang.Object ref = msgId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          msgId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *消息的唯一标识符
+       * </pre>
+       *
+       * <code>optional string msg_id = 6;</code>
+       * @param value The msgId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMsgId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        msgId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *消息的唯一标识符
+       * </pre>
+       *
+       * <code>optional string msg_id = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMsgId() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        msgId_ = getDefaultInstance().getMsgId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *消息的唯一标识符
+       * </pre>
+       *
+       * <code>optional string msg_id = 6;</code>
+       * @param value The bytes for msgId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMsgIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000010;
+        msgId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object extend_ = "";
+      /**
+       * <pre>
+       * 扩展字段
+       * </pre>
+       *
+       * <code>optional string extend = 7;</code>
+       * @return Whether the extend field is set.
+       */
+      public boolean hasExtend() {
+        return ((bitField0_ & 0x00000020) != 0);
+      }
+      /**
+       * <pre>
+       * 扩展字段
+       * </pre>
+       *
+       * <code>optional string extend = 7;</code>
+       * @return The extend.
+       */
+      public java.lang.String getExtend() {
+        java.lang.Object ref = extend_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            extend_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 扩展字段
+       * </pre>
+       *
+       * <code>optional string extend = 7;</code>
+       * @return The bytes for extend.
+       */
+      public com.google.protobuf.ByteString
+          getExtendBytes() {
+        java.lang.Object ref = extend_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          extend_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 扩展字段
+       * </pre>
+       *
+       * <code>optional string extend = 7;</code>
+       * @param value The extend to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExtend(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        extend_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 扩展字段
+       * </pre>
+       *
+       * <code>optional string extend = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearExtend() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        extend_ = getDefaultInstance().getExtend();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 扩展字段
+       * </pre>
+       *
+       * <code>optional string extend = 7;</code>
+       * @param value The bytes for extend to set.
+       * @return This builder for chaining.
+       */
+      public Builder setExtendBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000020;
+        extend_ = value;
+        onChanged();
+        return this;
+      }
+
       private int type_ ;
       /**
        * <pre>
@@ -1314,7 +1774,7 @@ public final class WSMsg {
        */
       @java.lang.Override
       public boolean hasType() {
-        return ((bitField0_ & 0x00000010) != 0);
+        return ((bitField0_ & 0x00000040) != 0);
       }
       /**
        * <pre>
@@ -1338,7 +1798,7 @@ public final class WSMsg {
        * @return This builder for chaining.
        */
       public Builder setType(int value) {
-        bitField0_ |= 0x00000010;
+        bitField0_ |= 0x00000040;
         type_ = value;
         onChanged();
         return this;
@@ -1352,7 +1812,7 @@ public final class WSMsg {
        * @return This builder for chaining.
        */
       public Builder clearType() {
-        bitField0_ = (bitField0_ & ~0x00000010);
+        bitField0_ = (bitField0_ & ~0x00000040);
         type_ = 0;
         onChanged();
         return this;
@@ -1368,7 +1828,7 @@ public final class WSMsg {
        * @return Whether the content field is set.
        */
       public boolean hasContent() {
-        return ((bitField0_ & 0x00000020) != 0);
+        return ((bitField0_ & 0x00000080) != 0);
       }
       /**
        * <pre>
@@ -1427,7 +1887,7 @@ public final class WSMsg {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000020;
+  bitField0_ |= 0x00000080;
         content_ = value;
         onChanged();
         return this;
@@ -1441,7 +1901,7 @@ public final class WSMsg {
        * @return This builder for chaining.
        */
       public Builder clearContent() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000080);
         content_ = getDefaultInstance().getContent();
         onChanged();
         return this;
@@ -1460,7 +1920,7 @@ public final class WSMsg {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000020;
+  bitField0_ |= 0x00000080;
         content_ = value;
         onChanged();
         return this;
@@ -1472,19 +1932,19 @@ public final class WSMsg {
        * 字节内容
        * </pre>
        *
-       * <code>optional bytes bytesContent = 20;</code>
+       * <code>optional bytes bytes_content = 20;</code>
        * @return Whether the bytesContent field is set.
        */
       @java.lang.Override
       public boolean hasBytesContent() {
-        return ((bitField0_ & 0x00000040) != 0);
+        return ((bitField0_ & 0x00000100) != 0);
       }
       /**
        * <pre>
        * 字节内容
        * </pre>
        *
-       * <code>optional bytes bytesContent = 20;</code>
+       * <code>optional bytes bytes_content = 20;</code>
        * @return The bytesContent.
        */
       @java.lang.Override
@@ -1496,7 +1956,7 @@ public final class WSMsg {
        * 字节内容
        * </pre>
        *
-       * <code>optional bytes bytesContent = 20;</code>
+       * <code>optional bytes bytes_content = 20;</code>
        * @param value The bytesContent to set.
        * @return This builder for chaining.
        */
@@ -1504,7 +1964,7 @@ public final class WSMsg {
         if (value == null) {
     throw new NullPointerException();
   }
-  bitField0_ |= 0x00000040;
+  bitField0_ |= 0x00000100;
         bytesContent_ = value;
         onChanged();
         return this;
@@ -1514,11 +1974,11 @@ public final class WSMsg {
        * 字节内容
        * </pre>
        *
-       * <code>optional bytes bytesContent = 20;</code>
+       * <code>optional bytes bytes_content = 20;</code>
        * @return This builder for chaining.
        */
       public Builder clearBytesContent() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000100);
         bytesContent_ = getDefaultInstance().getBytesContent();
         onChanged();
         return this;
@@ -1590,11 +2050,12 @@ public final class WSMsg {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\013WSMsg.proto\022\010protocol\"r\n\003Msg\022\013\n\003ops\030\001 " +
-      "\001(\005\022\014\n\004code\030\002 \001(\005\022\013\n\003msg\030\003 \001(\t\022\016\n\006target" +
-      "\030\005 \001(\t\022\014\n\004type\030\n \001(\005\022\017\n\007content\030\017 \001(\t\022\024\n" +
-      "\014bytesContent\030\024 \001(\014B-\n$top.pin90.friend." +
-      "chatserver.protocolB\005WSMsg"
+      "\n\013WSMsg.proto\022\010protocol\"\223\001\n\003Msg\022\013\n\003ops\030\001" +
+      " \001(\005\022\014\n\004code\030\002 \001(\005\022\013\n\003msg\030\003 \001(\t\022\016\n\006targe" +
+      "t\030\005 \001(\t\022\016\n\006msg_id\030\006 \001(\t\022\016\n\006extend\030\007 \001(\t\022" +
+      "\014\n\004type\030\n \001(\005\022\017\n\007content\030\017 \001(\t\022\025\n\rbytes_" +
+      "content\030\024 \001(\014B-\n$top.pin90.friend.chatse" +
+      "rver.protocolB\005WSMsg"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1605,7 +2066,7 @@ public final class WSMsg {
     internal_static_protocol_Msg_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_protocol_Msg_descriptor,
-        new java.lang.String[] { "Ops", "Code", "Msg", "Target", "Type", "Content", "BytesContent", });
+        new java.lang.String[] { "Ops", "Code", "Msg", "Target", "MsgId", "Extend", "Type", "Content", "BytesContent", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

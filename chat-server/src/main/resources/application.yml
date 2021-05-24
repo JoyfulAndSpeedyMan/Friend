@@ -7,14 +7,17 @@ spring:
   redis:
     host: localhost
   data:
-     mongodb:
+    mongodb:
       uri: mongodb://localhost:27017/FriendDev?ssl=false
       database: FriendDev
+    redis:
+      repositories:
+        enabled: false
 chat:
   server:
     port: 1000${id}
 zookeeper:
-  connectString: 192.168.110.128:2181
+  connectString: 192.168.110.129:2181
 
 auth:
   jwt:

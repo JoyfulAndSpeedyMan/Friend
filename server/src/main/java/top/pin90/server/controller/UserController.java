@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import top.pin90.common.annotation.FormData;
 import top.pin90.common.annotation.Token;
+import top.pin90.common.po.user.User;
 import top.pin90.common.pojo.ResponseResult;
 import top.pin90.server.dao.user.UserRepository;
 import top.pin90.server.service.UserService;
@@ -85,6 +86,10 @@ public class UserController {
         return personMono.map(Person::toString);
     }
 
-
+    @PutMapping
+    public Mono<ResponseResult> updateUserInfo(@Token ObjectId userId,@RequestBody User user){
+        user.setId(userId);
+        return userService.updateUserInfo(user);
+    }
 
 }

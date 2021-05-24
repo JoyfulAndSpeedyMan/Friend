@@ -2,7 +2,7 @@ package top.pin90.common.po.chat;
 /**
  * 消息的类型
  */
-public class MessageType {
+public interface MessageType {
     /**
      * 纯文本类型
      */

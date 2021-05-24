@@ -8,8 +8,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 /**
  * 聊天会话
@@ -25,11 +25,11 @@ public class ChatSession {
     /**
      * 是否是群会话
      */
-    private Boolean group;
+    private String sessionType;
     /**
      * 会话成员信息
      */
-    private List<UserSessionInfo> sessionInfos;
+    private Collection<UserSessionInfo> sessionInfos;
     /**
      * 会话创建的时间
      */
@@ -39,6 +39,9 @@ public class ChatSession {
      * 会话中的用户信息
      */
     @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class UserSessionInfo{
         /**
          * 用户Id

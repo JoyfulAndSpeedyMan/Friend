@@ -72,9 +72,11 @@ proto.protocol.Msg.toObject = function(includeInstance, msg) {
     code: (f = jspb.Message.getField(msg, 2)) == null ? undefined : f,
     msg: (f = jspb.Message.getField(msg, 3)) == null ? undefined : f,
     target: (f = jspb.Message.getField(msg, 5)) == null ? undefined : f,
+    msgId: (f = jspb.Message.getField(msg, 6)) == null ? undefined : f,
+    extend: (f = jspb.Message.getField(msg, 7)) == null ? undefined : f,
     type: (f = jspb.Message.getField(msg, 10)) == null ? undefined : f,
     content: (f = jspb.Message.getField(msg, 15)) == null ? undefined : f,
-    bytescontent: msg.getBytescontent_asB64()
+    bytesContent: msg.getBytesContent_asB64()
   };
 
   if (includeInstance) {
@@ -127,6 +129,14 @@ proto.protocol.Msg.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {string} */ (reader.readString());
       msg.setTarget(value);
       break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setMsgId(value);
+      break;
+    case 7:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setExtend(value);
+      break;
     case 10:
       var value = /** @type {number} */ (reader.readInt32());
       msg.setType(value);
@@ -137,7 +147,7 @@ proto.protocol.Msg.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 20:
       var value = /** @type {!Uint8Array} */ (reader.readBytes());
-      msg.setBytescontent(value);
+      msg.setBytesContent(value);
       break;
     default:
       reader.skipField();
@@ -193,6 +203,20 @@ proto.protocol.Msg.serializeBinaryToWriter = function(message, writer) {
   if (f != null) {
     writer.writeString(
       5,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 6));
+  if (f != null) {
+    writer.writeString(
+      6,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 7));
+  if (f != null) {
+    writer.writeString(
+      7,
       f
     );
   }
@@ -365,6 +389,78 @@ proto.protocol.Msg.prototype.hasTarget = function() {
 
 
 /**
+ * optional string msg_id = 6;
+ * @return {string}
+ */
+proto.protocol.Msg.prototype.getMsgId = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.protocol.Msg} returns this
+ */
+proto.protocol.Msg.prototype.setMsgId = function(value) {
+  return jspb.Message.setField(this, 6, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.protocol.Msg} returns this
+ */
+proto.protocol.Msg.prototype.clearMsgId = function() {
+  return jspb.Message.setField(this, 6, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.protocol.Msg.prototype.hasMsgId = function() {
+  return jspb.Message.getField(this, 6) != null;
+};
+
+
+/**
+ * optional string extend = 7;
+ * @return {string}
+ */
+proto.protocol.Msg.prototype.getExtend = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 7, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.protocol.Msg} returns this
+ */
+proto.protocol.Msg.prototype.setExtend = function(value) {
+  return jspb.Message.setField(this, 7, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.protocol.Msg} returns this
+ */
+proto.protocol.Msg.prototype.clearExtend = function() {
+  return jspb.Message.setField(this, 7, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.protocol.Msg.prototype.hasExtend = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
  * optional int32 type = 10;
  * @return {number}
  */
@@ -437,35 +533,35 @@ proto.protocol.Msg.prototype.hasContent = function() {
 
 
 /**
- * optional bytes bytesContent = 20;
+ * optional bytes bytes_content = 20;
  * @return {!(string|Uint8Array)}
  */
-proto.protocol.Msg.prototype.getBytescontent = function() {
+proto.protocol.Msg.prototype.getBytesContent = function() {
   return /** @type {!(string|Uint8Array)} */ (jspb.Message.getFieldWithDefault(this, 20, ""));
 };
 
 
 /**
- * optional bytes bytesContent = 20;
- * This is a type-conversion wrapper around `getBytescontent()`
+ * optional bytes bytes_content = 20;
+ * This is a type-conversion wrapper around `getBytesContent()`
  * @return {string}
  */
-proto.protocol.Msg.prototype.getBytescontent_asB64 = function() {
+proto.protocol.Msg.prototype.getBytesContent_asB64 = function() {
   return /** @type {string} */ (jspb.Message.bytesAsB64(
-      this.getBytescontent()));
+      this.getBytesContent()));
 };
 
 
 /**
- * optional bytes bytesContent = 20;
+ * optional bytes bytes_content = 20;
  * Note that Uint8Array is not supported on all browsers.
  * @see http://caniuse.com/Uint8Array
- * This is a type-conversion wrapper around `getBytescontent()`
+ * This is a type-conversion wrapper around `getBytesContent()`
  * @return {!Uint8Array}
  */
-proto.protocol.Msg.prototype.getBytescontent_asU8 = function() {
+proto.protocol.Msg.prototype.getBytesContent_asU8 = function() {
   return /** @type {!Uint8Array} */ (jspb.Message.bytesAsU8(
-      this.getBytescontent()));
+      this.getBytesContent()));
 };
 
 
@@ -473,7 +569,7 @@ proto.protocol.Msg.prototype.getBytescontent_asU8 = function() {
  * @param {!(string|Uint8Array)} value
  * @return {!proto.protocol.Msg} returns this
  */
-proto.protocol.Msg.prototype.setBytescontent = function(value) {
+proto.protocol.Msg.prototype.setBytesContent = function(value) {
   return jspb.Message.setField(this, 20, value);
 };
 
@@ -482,7 +578,7 @@ proto.protocol.Msg.prototype.setBytescontent = function(value) {
  * Clears the field making it undefined.
  * @return {!proto.protocol.Msg} returns this
  */
-proto.protocol.Msg.prototype.clearBytescontent = function() {
+proto.protocol.Msg.prototype.clearBytesContent = function() {
   return jspb.Message.setField(this, 20, undefined);
 };
 
@@ -491,7 +587,7 @@ proto.protocol.Msg.prototype.clearBytescontent = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.protocol.Msg.prototype.hasBytescontent = function() {
+proto.protocol.Msg.prototype.hasBytesContent = function() {
   return jspb.Message.getField(this, 20) != null;
 };
 

@@ -3,7 +3,7 @@ package top.pin90.server.dao.post;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import top.pin90.common.dao.BsonManager;
 import top.pin90.common.po.post.PostComment;
@@ -11,7 +11,8 @@ import top.pin90.server.dao.JsonOperation;
 
 import java.util.Map;
 
-@Repository
+//@Repository
+@Component
 public class PostCommentDao {
     private final ReactiveMongoTemplate template;
     private final BsonManager bsonManager;

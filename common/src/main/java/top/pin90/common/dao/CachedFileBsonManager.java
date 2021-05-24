@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CachedFileBsonManager implements BsonManager {
-    public final static Pattern placeholder = Pattern.compile("#\\{(.*)}");
+    public final static Pattern placeholder = Pattern.compile("#\\{(.*?)}");
 
     private String basePath;
     private Map<String, String> cached = new ConcurrentHashMap<>();

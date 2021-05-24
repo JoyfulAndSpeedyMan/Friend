@@ -36,13 +36,9 @@ public class UserChatSession {
      */
     private Integer unread;
     /**
-     * 最后一条消息的Id
-     */
-    private ObjectId lMsgId;
-    /**
      * 是否是群组会话
      */
-    private Boolean group;
+    private String sessionType;
     /**
      * 会话的Id
      */
