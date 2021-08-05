@@ -1,0 +1,7 @@
+server:
+  port: 9200
+spring:
+  application:
+    name: route-service
+zookeeper:
+  address: 192.168.0.111:2181

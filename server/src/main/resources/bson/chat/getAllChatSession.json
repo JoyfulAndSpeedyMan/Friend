@@ -1,0 +1,86 @@
+[{$match: {
+  userId: ObjectId('#{userId}')
+}}, {$lookup: {
+  from: 'User',
+  localField: 'tid',
+  foreignField: '_id',
+  as: 'fuser'
+}}, {$lookup: {
+  from: 'UserFriendRelation',
+  let: {uid: '$userId',tid: '$tid'},
+  pipeline: [
+    {
+      $match:{
+        $expr:{
+          $and:[
+            {$eq: ['$fuid','$$uid']},
+            {$eq: ['$suid','$$tid']}
+          ]
+        }
+      }
+    }
+  ],
+  as: 'friendInfo'
+}}, {$unwind: {
+  path: '$friendInfo',
+  preserveNullAndEmptyArrays: true
+}}, {$unwind: {
+  path: '$fuser'
+}}, {$lookup: {
+  from: 'ChatSessionMessage',
+  let : {sid : '$sessionId'},
+  pipeline: [
+    {
+      $match:{
+        $expr:{
+          $eq: ['$chatSessionId','$$sid']
+        }
+      }
+    },
+    {
+      $sort:{
+        createTime: -1
+      }
+    },
+    {
+      $limit:10
+    },
+    {
+      $project:{
+        _id:1,
+        type:1,
+        promulgator:1,
+        content: 1,
+        createTime:1,
+        status:1
+      }
+    }
+  ],
+  as: 'msgs'
+}}, {$project: {
+  fid: '$tid',
+  avatar: '$fuser.avatar',
+  friendName: {
+    $switch: {
+      branches: [{
+        case: {
+          $and: ["$friendInfo.noteName", 1]
+        },
+        then: "$friendInfo.noteName"
+      },
+        {
+          case: {
+            $and: ["$fuser.nickname", 1]
+          },
+          then: "$fuser.nickname"
+        },
+      ],
+      default: "$fuser.phone"
+    }
+  },
+  unread: 1,
+  sessionType : 1,
+  sessionId:1,
+  createTime: 1,
+  msgs:1
+}}]

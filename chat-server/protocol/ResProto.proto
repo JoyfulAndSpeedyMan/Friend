@@ -1,0 +1,16 @@
+syntax = "proto2";
+package protocol;
+// JAVA
+// protoc --proto_path=. --java_out=../src/main/java ReqProto.proto ResProto.proto
+
+option java_package = "top.pin90.friend.chatserver.protocol.res";
+option java_outer_classname = "ResProto";
+message BaseRes {
+  required int32 result = 1;   //要进行的操作
+  optional int32 ops = 2;   //要进行的操作
+
+  optional int32 type = 5;    // 内容的类型
+  optional string content = 6;  // 字符串内容
+  optional bytes bytesContent = 7; // 字节内容
+}
+

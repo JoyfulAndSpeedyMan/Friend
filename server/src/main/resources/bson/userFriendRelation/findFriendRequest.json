@@ -1,0 +1,19 @@
+[{$match: {
+  suid: ObjectId('#{userId}'),
+  status: 'REQUEST'
+}}, {$lookup: {
+  from: 'User',
+  localField: 'fuid',
+  foreignField: '_id',
+  as: 'friend'
+}}, {$unwind: {
+  path: '$friend'
+}}, {$project: {
+  _id:1,
+  fId: '$fuid',
+  requestMsg: 1,
+  nickname: '$friend.nickname',
+  avatar: '$friend.avatar',
+  sex: '$friend.sex',
+  phone: '$friend.phone'
+}}]

@@ -1,0 +1,76 @@
+[{
+    $match: {
+        postId: ObjectId('#{postId}'),
+        status: "#{status}"
+    }
+}, {
+    $lookup: {
+        from: 'User',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user'
+    }
+}, {
+    $unwind: {
+        path: "$user",
+        preserveNullAndEmptyArrays: false
+    }
+}, {
+    $lookup: {
+        from: 'PostComment',
+        let: {
+            replyId: "$replyId"
+        },
+        pipeline: [{
+                $match: {
+                    $expr: {
+                        $eq: ['$_id', '$$replyId']
+                    }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'User',
+                    localField: 'userId',
+                    foreignField: '_id',
+                    as: 'user'
+                }
+            },
+            {
+                $unwind: {
+                    path: "$user"
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    content: 1,
+                    userId: "$user._id",
+                    nickName: "$user.nickname"
+                }
+            }
+        ],
+        as: 'replyComment'
+    }
+}, {
+    $unwind: {
+        path: "$replyComment",
+        preserveNullAndEmptyArrays: true
+    }
+}, {
+    $project: {
+        _id: 1,
+        userId: 1,
+        nickname: "$user.nickname",
+        content: 1,
+        thumb: 1,
+        createTime: 1,
+        replyUserId: 1,
+        replyId: 1,
+        replyComment: 1
+    }
+}, {
+    $skip: #{page}
+}, {
+    $limit: #{size}
+}]

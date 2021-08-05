@@ -1,0 +1,105 @@
+[{
+  $lookup: {
+    from: 'Post',
+    localField: 'forwardPid',
+    foreignField: '_id',
+    as: 'array'
+  }
+}, {
+  $unwind: {
+    path: '$array',
+    preserveNullAndEmptyArrays: true
+  }
+}, {
+  $lookup: {
+    from: 'PostThumb',
+    'let': {
+      uid: '$userId',
+      pid: '$_id'
+    },
+    pipeline: [{
+      $match: {
+        $expr: {
+          $and: [{
+            $eq: [
+              '$userId',
+              '$$uid'
+            ]
+          },
+            {
+              $eq: [
+                '$postId',
+                '$$pid'
+              ]
+            }
+          ]
+        }
+      }
+    }],
+    as: 'thumbInfo'
+  }
+}, {
+  $addFields: {
+    isThumb: {
+      $gt: [{
+        $size: '$thumbInfo'
+      },
+        0
+      ]
+    }
+  }
+}, {
+  $lookup: {
+    from: 'User',
+    localField: 'userId',
+    foreignField: '_id',
+    as: 'user'
+  }
+}, {
+  $unwind: {
+    path: "$user",
+    preserveNullAndEmptyArrays: true
+  }
+}, {
+  $lookup: {
+    from: 'User',
+    localField: 'forwardUid',
+    foreignField: '_id',
+    as: 'fUser'
+  }
+}, {
+  $unwind: {
+    path: "$fUser",
+    preserveNullAndEmptyArrays: true
+  }
+}, {
+  $sort: {
+    createTime: -1
+  }
+},{
+  $project: {
+    userId: 1,
+    nickname: '$user.nickname',
+    avatar: '$user.avatar',
+    forwardPid: 1,
+    forwardUid: 1,
+    forwardUName: "$fUser.nickname",
+    content: {
+      $ifNull: [
+        '$content',
+        '$array.content'
+      ]
+    },
+    thumb: 1,
+    isThumb: 1,
+    comment: 1,
+    forward: 1,
+    createTime: 1,
+    updateTime: 1,
+    _class: 1
+  }
+}, {
+  $skip: #{page}
+}, {
+  $limit: #{size}
+}]

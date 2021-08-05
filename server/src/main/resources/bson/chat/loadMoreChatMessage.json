@@ -1,0 +1,5 @@
+[{$match: {
+  chatSessionId: ObjectId('#{sessionId}')
+}}, {$sort: {
+  createTime: -1
+}}, {$skip: #{skip} }, {$limit: #{limit} }]

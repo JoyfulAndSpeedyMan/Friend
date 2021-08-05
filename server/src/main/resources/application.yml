@@ -1,0 +1,46 @@
+server:
+  port: 10000
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/FriendDev?ssl=false
+      database: FriendDev
+    redis:
+      repositories:
+        enabled: false
+  webflux:
+    static-path-pattern: /resources/**
+  application:
+    name: server
+  redis:
+    host: localhost
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+#    default-property-inclusion: non_null
+auth:
+  jwt:
+    secret: 123456
+    userIdKey: userId
+    iss: pin
+  token:
+    key: Authorization
+    prefix: 'Bearer '
+user:
+  login:
+    accessValidTime: 155520000
+    refreshValidTime: 155520000
+    code:
+      codeType: code6
+      validTime: 60
+    new:
+      avatar: /resources/ys.jpg
+logging:
+  level:
+    top:
+      pin90:
+        server: trace
+    org:
+      springframework:
+        data:
+          mongodb:
+            core: debug

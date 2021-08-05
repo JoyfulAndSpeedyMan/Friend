@@ -1,0 +1,22 @@
+syntax = "proto2";
+package protocol;
+// Java
+// protoc --proto_path=. --java_out=../src/main/java WSMsg.proto
+// Java Script
+// protoc --proto_path=. --js_out=import_style=commonjs,binary:js WSMsg.proto
+option java_package = "top.pin90.friend.chatserver.protocol";
+option java_outer_classname = "WSMsg";
+message Msg {
+  optional int32 ops = 1;   // 是要进行的操作
+  optional int32 code = 2;
+  optional string msg = 3;
+  optional string target = 5;  // 消息的目标
+  optional string msg_id = 6;   //消息的唯一标识符
+  optional string extend = 7;   // 扩展字段
+
+  optional int32 type = 10;    // 内容的类型
+  optional string content = 15;  // 字符串内容
+  optional bytes bytes_content = 20; // 字节内容
+}
+
+
